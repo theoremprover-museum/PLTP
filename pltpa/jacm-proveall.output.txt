@@ -1,0 +1,6385 @@
+PLTP !>(proveall :jacm)
+
+:JACM Proveall by PLTP(A)
+March 24, 2018  12:19:02
+ACL2 Version 8.0.  Level 2.  Cbd "/Users/moore/pltpa/".
+System books directory "/Users/moore/acl2/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+PLTP !>>(BOOT-STRAP)
+ (((LENGTH (@ WRLD)) 111)
+  ((PROPS :FEATURE)
+   ((:UNTRANSLATE-ENABLED T)
+    (:UNTRANSLATE-IF-TO-COND T)
+    (:UNTRANSLATE-CONSTANTS T)
+    (:UNTRANSLATE-LOGICAL-CONNECTIVES NIL)
+    (:HELP
+     "(set-feature key val) for keys above or
+      (set-feature :ALL val) with val being one of
+      :defaults, :pltp-notation, or :raw-notation"))))
+PLTP !>>(SET-FEATURE :ALL :PLTP-NOTATION)
+ ((:UNTRANSLATE-ENABLED T)
+  (:UNTRANSLATE-IF-TO-COND T)
+  (:UNTRANSLATE-CONSTANTS T)
+  (:UNTRANSLATE-LOGICAL-CONNECTIVES NIL)
+  (:HELP
+   "(set-feature key val) for keys above or
+      (set-feature :ALL val) with val being one of
+      :defaults, :pltp-notation, or :raw-notation"))
+PLTP !>>(DCL (APPLY (X Y)))
+ APPLY
+PLTP !>>(DCL (APPLY2 (X Y Z)))
+ APPLY2
+PLTP !>>(DEFINE (LENGTH (LAMBDA (X)
+                                (COND X (ADD1 (LENGTH (CDR X))) 0))))
+ LENGTH
+PLTP !>>(DEFINE (ADD (LAMBDA (X Y)
+                             (COND (ZEROP X)
+                                   (LENGTH Y)
+                                   (ADD1 (ADD (SUB1 X) Y))))))
+ ADD
+PLTP !>>(DEFINE (LTE (LAMBDA (X Y)
+                             (COND (ZEROP X)
+                                   T
+                                   (COND (ZEROP Y)
+                                         NIL (LTE (SUB1 X) (SUB1 Y)))))))
+ LTE
+PLTP !>>(DEFINE
+         (ADDTOLIST (LAMBDA (X Y)
+                            (COND Y
+                                  (COND (LTE X (CAR Y))
+                                        (CONS X Y)
+                                        (CONS (CAR Y) (ADDTOLIST X (CDR Y))))
+                                  (CONS X NIL)))))
+ ADDTOLIST
+PLTP !>>(DEFINE (APPEND (LAMBDA (X Y)
+                                (COND X (CONS (CAR X) (APPEND (CDR X) Y))
+                                      Y))))
+ APPEND
+PLTP !>>(DEFINE (ASSOC (LAMBDA (X Y)
+                               (COND Y
+                                     (COND (CAR Y)
+                                           (COND (EQUAL X (CAR (CAR Y)))
+                                                 (CAR Y)
+                                                 (ASSOC X (CDR Y)))
+                                           (ASSOC X (CDR Y)))
+                                     NIL))))
+ ASSOC
+PLTP !>>(DEFINE (CDRN (LAMBDA (X Y)
+                              (COND Y
+                                    (COND (ZEROP X)
+                                          Y (CDRN (SUB1 X) (CDR Y)))
+                                    NIL))))
+ CDRN
+PLTP !>>(DEFINE (CONSNODE (LAMBDA (X Y) (CONS NIL (CONS X Y)))))
+ CONSNODE
+PLTP !>>(DEFINE (COPY (LAMBDA (X)
+                              (COND X (CONS (COPY (CAR X)) (COPY (CDR X)))
+                                    NIL))))
+ COPY
+PLTP !>>(DEFINE (COUNT (LAMBDA (X Y)
+                               (COND Y
+                                     (COND (EQUAL X (CAR Y))
+                                           (ADD1 (COUNT X (CDR Y)))
+                                           (COUNT X (CDR Y)))
+                                     0))))
+ COUNT
+PLTP !>>(DEFINE (DOUBLE (LAMBDA (X)
+                                (COND (ZEROP X)
+                                      0 (ADD 2 (DOUBLE (SUB1 X)))))))
+ DOUBLE
+PLTP !>>(DEFINE (ELEMENT (LAMBDA (X Y)
+                                 (COND Y
+                                       (COND (ZEROP X)
+                                             (CAR Y)
+                                             (ELEMENT (SUB1 X) (CDR Y)))
+                                       NIL))))
+ ELEMENT
+PLTP !>>(DEFINE (EQUALP (LAMBDA (X Y)
+                                (COND X
+                                      (COND Y
+                                            (COND (EQUALP (CAR X) (CAR Y))
+                                                  (EQUALP (CDR X) (CDR Y))
+                                                  NIL)
+                                            NIL)
+                                      (COND Y NIL T)))))
+ EQUALP
+PLTP !>>(DEFINE (EVEN1 (LAMBDA (PARITY X)
+                               (COND (ZEROP X)
+                                     (IF PARITY T NIL)
+                                     (EVEN1 (NOT PARITY) (SUB1 X))))))
+ EVEN1
+PLTP !>>(DEFINE (EVEN2 (LAMBDA (X)
+                               (COND (ZEROP X)
+                                     T
+                                     (COND (ZEROP (SUB1 X))
+                                           NIL (EVEN2 (SUB1 (SUB1 X))))))))
+ EVEN2
+PLTP !>>(DEFINE (NODE (LAMBDA (X)
+                              (COND X
+                                    (COND (CAR X) NIL (COND (CDR X) T NIL))
+                                    NIL))))
+ NODE
+PLTP !>>(DEFINE (FLATTEN (LAMBDA (X)
+                                 (COND (NODE X)
+                                       (APPEND (FLATTEN (CAR (CDR X)))
+                                               (FLATTEN (CDR (CDR X))))
+                                       (CONS X NIL)))))
+FLATTEN may not terminate.
+ FLATTEN
+PLTP !>>(DEFINE (GT (LAMBDA (X Y)
+                            (COND (ZEROP X)
+                                  NIL
+                                  (COND (ZEROP Y)
+                                        T (GT (SUB1 X) (SUB1 Y)))))))
+ GT
+PLTP !>>(DEFINE
+             (HALF (LAMBDA (X)
+                           (COND (ZEROP X)
+                                 0
+                                 (COND (ZEROP (SUB1 X))
+                                       0 (ADD1 (HALF (SUB1 (SUB1 X)))))))))
+ HALF
+PLTP !>>(DEFINE (MEMBER (LAMBDA (X Y)
+                                (COND Y
+                                      (COND (EQUAL X (CAR Y))
+                                            T (MEMBER X (CDR Y)))
+                                      NIL))))
+ MEMBER
+PLTP !>>(DEFINE
+          (INTERSECT (LAMBDA (X Y)
+                             (COND X
+                                   (COND (MEMBER (CAR X) Y)
+                                         (CONS (CAR X) (INTERSECT (CDR X) Y))
+                                         (INTERSECT (CDR X) Y))
+                                   NIL))))
+ INTERSECT
+PLTP !>>(DEFINE (LAST (LAMBDA (X)
+                              (COND X (COND (CDR X) (LAST (CDR X)) (CAR X))
+                                    NIL))))
+ LAST
+PLTP !>>(DEFINE (LIT (LAMBDA (X Y Z)
+                             (COND X (APPLY2 Z (CAR X) (LIT (CDR X) Y Z))
+                                   Y))))
+ LIT
+PLTP !>>(DEFINE (MAPLIST (LAMBDA (X Y)
+                                 (COND X
+                                       (CONS (APPLY Y (CAR X))
+                                             (MAPLIST (CDR X) Y))
+                                       NIL))))
+ MAPLIST
+PLTP !>>(DEFINE
+             (MONOT1 (LAMBDA (X)
+                             (COND X
+                                   (COND (CDR X)
+                                         (COND (EQUAL (CAR X) (CAR (CDR X)))
+                                               (MONOT1 (CDR X))
+                                               NIL)
+                                         T)
+                                   T))))
+ MONOT1
+PLTP !>>(DEFINE (MONOT2 (LAMBDA (X Y)
+                                (COND Y
+                                      (COND (EQUAL X (CAR Y))
+                                            (MONOT2 X (CDR Y))
+                                            NIL)
+                                      T))))
+ MONOT2
+PLTP !>>(DEFINE (MONOT2P (LAMBDA (X)
+                                 (COND X (MONOT2 (CAR X) (CDR X)) T))))
+ MONOT2P
+PLTP !>>(DEFINE (MULT (LAMBDA (X Y)
+                              (COND (ZEROP X)
+                                    0 (ADD Y (MULT (SUB1 X) Y))))))
+ MULT
+PLTP !>>(DEFINE (OCCUR (LAMBDA (X Y)
+                               (COND (EQUAL X Y)
+                                     T
+                                     (COND Y
+                                           (COND (OCCUR X (CAR Y))
+                                                 T (OCCUR X (CDR Y)))
+                                           NIL)))))
+ OCCUR
+PLTP !>>(DEFINE
+             (ORDERED (LAMBDA (X)
+                              (COND X
+                                    (COND (CDR X)
+                                          (COND (LTE (CAR X) (CAR (CDR X)))
+                                                (ORDERED (CDR X))
+                                                NIL)
+                                          T)
+                                    T))))
+ ORDERED
+PLTP !>>(DEFINE
+             (PAIRLIST (LAMBDA (X Y)
+                               (COND X
+                                     (COND Y
+                                           (CONS (CONS (CAR X) (CAR Y))
+                                                 (PAIRLIST (CDR X) (CDR Y)))
+                                           (CONS (CONS (CAR X) NIL)
+                                                 (PAIRLIST (CDR X) NIL)))
+                                     NIL))))
+ PAIRLIST
+PLTP !>>(DEFINE (REVERSE (LAMBDA (X)
+                                 (COND X
+                                       (APPEND (REVERSE (CDR X))
+                                               (CONS (CAR X) NIL))
+                                       NIL))))
+ REVERSE
+PLTP !>>(DEFINE (SORT (LAMBDA (X)
+                              (COND X (ADDTOLIST (CAR X) (SORT (CDR X)))
+                                    NIL))))
+ SORT
+PLTP !>>(DEFINE (SUBSET (LAMBDA (X Y)
+                                (COND X
+                                      (COND (MEMBER (CAR X) Y)
+                                            (SUBSET (CDR X) Y)
+                                            NIL)
+                                      T))))
+ SUBSET
+PLTP !>>(DEFINE (SUBST (LAMBDA (X Y Z)
+                               (COND (EQUAL Y Z)
+                                     X
+                                     (COND Z
+                                           (CONS (SUBST X Y (CAR Z))
+                                                 (SUBST X Y (CDR Z)))
+                                           NIL)))))
+ SUBST
+PLTP !>>(DEFINE (SWAPTREE (LAMBDA (X)
+                                  (COND (NODE X)
+                                        (CONSNODE (SWAPTREE (CDR (CDR X)))
+                                                  (SWAPTREE (CAR (CDR X))))
+                                        X))))
+SWAPTREE may not terminate.
+ SWAPTREE
+PLTP !>>(DEFINE (TIPCOUNT (LAMBDA (X)
+                                  (COND (NODE X)
+                                        (ADD (TIPCOUNT (CAR (CDR X)))
+                                             (TIPCOUNT (CDR (CDR X))))
+                                        1))))
+TIPCOUNT may not terminate.
+ TIPCOUNT
+PLTP !>>(DEFINE (UNION (LAMBDA (X Y)
+                               (COND X
+                                     (COND (MEMBER (CAR X) Y)
+                                           (UNION (CDR X) Y)
+                                           (CONS (CAR X) (UNION (CDR X) Y)))
+                                     Y))))
+ UNION
+PLTP !>>(PROVE JACM-1
+               (EQUAL (APPEND A (APPEND B C))
+                      (APPEND (APPEND A B) C)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (APPEND NIL (APPEND B C))
+            (APPEND (APPEND NIL B) C))
+     (IMPLIES (EQUAL (APPEND A (APPEND B C))
+                     (APPEND (APPEND A B) C))
+              (EQUAL (APPEND (CONS A1 A) (APPEND B C))
+                     (APPEND (APPEND (CONS A1 A) B) C)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-2
+               (IMPLIES (EQUAL (APPEND A B) (APPEND A C))
+                        (EQUAL B C)))
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (APPEND A B) (APPEND A C))
+      (EQUAL B C)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (EQUAL (APPEND NIL B) (APPEND NIL C))
+           (EQUAL B C)
+           T)
+     (IMPLIES (COND (EQUAL (APPEND A B) (APPEND A C))
+                    (EQUAL B C)
+                    T)
+              (COND (EQUAL (APPEND (CONS A1 A) B)
+                           (APPEND (CONS A1 A) C))
+                    (EQUAL B C)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-3
+               (EQUAL (LENGTH (APPEND A B))
+                      (LENGTH (APPEND B A))))
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LENGTH (APPEND A NIL))
+            (LENGTH (APPEND NIL A)))
+     (IMPLIES (EQUAL (LENGTH (APPEND A B))
+                     (LENGTH (APPEND B A)))
+              (EQUAL (LENGTH (APPEND A (CONS B1 B)))
+                     (LENGTH (APPEND (CONS B1 B) A))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (LENGTH (APPEND A NIL))
+             (LENGTH A))
+      (COND (EQUAL (LENGTH (APPEND A B))
+                   (LENGTH (APPEND B A)))
+            (EQUAL (LENGTH (APPEND A (CONS B1 B)))
+                   (CONS NIL (LENGTH (APPEND B A))))
+            T)
+      NIL).
+
+FERTILIZE WITH (EQUAL (LENGTH (APPEND A B)) (LENGTH (APPEND B A))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL (LENGTH (APPEND A NIL))
+             (LENGTH A))
+      (EQUAL (LENGTH (APPEND A (CONS B1 B)))
+             (CONS NIL (LENGTH (APPEND A B))))
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (EQUAL (LENGTH (APPEND NIL NIL))
+                  (LENGTH NIL))
+           (IMPLIES (EQUAL (LENGTH (APPEND A NIL))
+                           (LENGTH A))
+                    (EQUAL (LENGTH (APPEND (CONS A1 A) NIL))
+                           (LENGTH (CONS A1 A)))))
+      (EQUAL (LENGTH (APPEND A2 (CONS B1 B)))
+             (CONS NIL (LENGTH (APPEND A2 B))))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(EQUAL (LENGTH (APPEND A2 (CONS B1 B)))
+       (CONS NIL (LENGTH (APPEND A2 B)))).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LENGTH (APPEND NIL (CONS B1 B)))
+            (CONS NIL (LENGTH (APPEND NIL B))))
+     (IMPLIES (EQUAL (LENGTH (APPEND A2 (CONS B1 B)))
+                     (CONS NIL (LENGTH (APPEND A2 B))))
+              (EQUAL (LENGTH (APPEND (CONS A3 A2) (CONS B1 B)))
+                     (CONS NIL
+                           (LENGTH (APPEND (CONS A3 A2) B)))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-4
+               (EQUAL (REVERSE (APPEND A B))
+                      (APPEND (REVERSE B) (REVERSE A))))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (REVERSE (APPEND NIL B))
+            (APPEND (REVERSE B) (REVERSE NIL)))
+     (IMPLIES (EQUAL (REVERSE (APPEND A B))
+                     (APPEND (REVERSE B) (REVERSE A)))
+              (EQUAL (REVERSE (APPEND (CONS A1 A) B))
+                     (APPEND (REVERSE B)
+                             (REVERSE (CONS A1 A)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (REVERSE B)
+             (APPEND (REVERSE B) NIL))
+      (COND (EQUAL (REVERSE (APPEND A B))
+                   (APPEND (REVERSE B) (REVERSE A)))
+            (EQUAL (APPEND (REVERSE (APPEND A B))
+                           (CONS A1 NIL))
+                   (APPEND (REVERSE B)
+                           (APPEND (REVERSE A) (CONS A1 NIL))))
+            T)
+      NIL).
+
+FERTILIZE WITH 
+(EQUAL (REVERSE (APPEND A B)) (APPEND (REVERSE B) (REVERSE A))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL (REVERSE B)
+             (APPEND (REVERSE B) NIL))
+      (EQUAL (APPEND (APPEND (REVERSE B) (REVERSE A))
+                     (CONS A1 NIL))
+             (APPEND (REVERSE B)
+                     (APPEND (REVERSE A) (CONS A1 NIL))))
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+GENERALIZE COMMON SUBTERM BY REPLACING (REVERSE B) BY GENRL1.
+
+THE GENERALIZED (first conjunct) TERM IS:
+(EQUAL GENRL1 (APPEND GENRL1 NIL))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (EQUAL NIL (APPEND NIL NIL))
+           (IMPLIES (EQUAL GENRL1 (APPEND GENRL1 NIL))
+                    (EQUAL (CONS GENRL2 GENRL1)
+                           (APPEND (CONS GENRL2 GENRL1) NIL))))
+      (EQUAL (APPEND (APPEND (REVERSE B) (REVERSE A))
+                     (CONS A1 NIL))
+             (APPEND (REVERSE B)
+                     (APPEND (REVERSE A) (CONS A1 NIL))))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(EQUAL (APPEND (APPEND (REVERSE B) (REVERSE A))
+               (CONS A1 NIL))
+       (APPEND (REVERSE B)
+               (APPEND (REVERSE A) (CONS A1 NIL)))).
+
+GENERALIZE COMMON SUBTERMS BY REPLACING (REVERSE A) BY GENRL1 AND 
+(REVERSE B) BY GENRL2.
+
+THE GENERALIZED TERM IS:
+(EQUAL (APPEND (APPEND GENRL2 GENRL1)
+               (CONS A1 NIL))
+       (APPEND GENRL2 (APPEND GENRL1 (CONS A1 NIL))))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (APPEND (APPEND NIL GENRL1)
+                    (CONS A1 NIL))
+            (APPEND NIL (APPEND GENRL1 (CONS A1 NIL))))
+     (IMPLIES (EQUAL (APPEND (APPEND GENRL2 GENRL1)
+                             (CONS A1 NIL))
+                     (APPEND GENRL2 (APPEND GENRL1 (CONS A1 NIL))))
+              (EQUAL (APPEND (APPEND (CONS GENRL3 GENRL2) GENRL1)
+                             (CONS A1 NIL))
+                     (APPEND (CONS GENRL3 GENRL2)
+                             (APPEND GENRL1 (CONS A1 NIL)))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-5
+               (EQUAL (LENGTH (REVERSE D)) (LENGTH D)))
+MUST TRY INDUCTION.
+
+INDUCT ON D.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LENGTH (REVERSE NIL))
+            (LENGTH NIL))
+     (IMPLIES (EQUAL (LENGTH (REVERSE D)) (LENGTH D))
+              (EQUAL (LENGTH (REVERSE (CONS D1 D)))
+                     (LENGTH (CONS D1 D))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (LENGTH (REVERSE D)) (LENGTH D))
+      (EQUAL (LENGTH (APPEND (REVERSE D) (CONS D1 NIL)))
+             (CONS NIL (LENGTH D)))
+      T).
+
+FERTILIZE WITH (EQUAL (LENGTH (REVERSE D)) (LENGTH D)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (LENGTH (APPEND (REVERSE D) (CONS D1 NIL)))
+       (CONS NIL (LENGTH (REVERSE D)))).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (REVERSE D) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(EQUAL (LENGTH (APPEND GENRL1 (CONS D1 NIL))) (CONS NIL (LENGTH GENRL1)))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LENGTH (APPEND NIL (CONS D1 NIL)))
+            (CONS NIL (LENGTH NIL)))
+     (IMPLIES (EQUAL (LENGTH (APPEND GENRL1 (CONS D1 NIL)))
+                     (CONS NIL (LENGTH GENRL1)))
+              (EQUAL (LENGTH (APPEND (CONS GENRL2 GENRL1)
+                                     (CONS D1 NIL)))
+                     (CONS NIL (LENGTH (CONS GENRL2 GENRL1)))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-6 (EQUAL (REVERSE (REVERSE A)) A))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (REVERSE (REVERSE NIL)) NIL)
+     (IMPLIES (EQUAL (REVERSE (REVERSE A)) A)
+              (EQUAL (REVERSE (REVERSE (CONS A1 A)))
+                     (CONS A1 A)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (REVERSE (REVERSE A)) A)
+      (EQUAL (REVERSE (APPEND (REVERSE A) (CONS A1 NIL)))
+             (CONS A1 A))
+      T).
+
+FERTILIZE WITH (EQUAL (REVERSE (REVERSE A)) A).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (REVERSE (APPEND (REVERSE A) (CONS A1 NIL)))
+       (CONS A1 (REVERSE (REVERSE A)))).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (REVERSE A) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(EQUAL (REVERSE (APPEND GENRL1 (CONS A1 NIL))) (CONS A1 (REVERSE GENRL1)))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (REVERSE (APPEND NIL (CONS A1 NIL)))
+            (CONS A1 (REVERSE NIL)))
+     (IMPLIES (EQUAL (REVERSE (APPEND GENRL1 (CONS A1 NIL)))
+                     (CONS A1 (REVERSE GENRL1)))
+              (EQUAL (REVERSE (APPEND (CONS GENRL2 GENRL1)
+                                      (CONS A1 NIL)))
+                     (CONS A1 (REVERSE (CONS GENRL2 GENRL1)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (REVERSE (APPEND GENRL1 (CONS A1 NIL)))
+             (CONS A1 (REVERSE GENRL1)))
+      (EQUAL (APPEND (REVERSE (APPEND GENRL1 (CONS A1 NIL)))
+                     (CONS GENRL2 NIL))
+             (CONS A1
+                   (APPEND (REVERSE GENRL1)
+                           (CONS GENRL2 NIL))))
+      T).
+
+FERTILIZE WITH 
+(EQUAL (REVERSE (APPEND GENRL1 (CONS A1 NIL))) (CONS A1 (REVERSE GENRL1))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (APPEND (CONS A1 (REVERSE GENRL1))
+               (CONS GENRL2 NIL))
+       (CONS A1
+             (APPEND (REVERSE GENRL1)
+                     (CONS GENRL2 NIL)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-7
+               (IMPLIES A (EQUAL (LAST (REVERSE A)) (CAR A))))
+WHICH IS EQUIVALENT TO:
+(COND A (EQUAL (LAST (REVERSE A)) (CAR A))
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND NIL
+           (EQUAL (LAST (REVERSE NIL)) (CAR NIL))
+           T)
+     (IMPLIES (COND A (EQUAL (LAST (REVERSE A)) (CAR A))
+                    T)
+              (COND (CONS A1 A)
+                    (EQUAL (LAST (REVERSE (CONS A1 A)))
+                           (CAR (CONS A1 A)))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND A
+      (COND (EQUAL (LAST (REVERSE A)) (CAR A))
+            (EQUAL (LAST (APPEND (REVERSE A) (CONS A1 NIL)))
+                   A1)
+            T)
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (REVERSE A) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(COND A
+      (COND (EQUAL (LAST GENRL1) (CAR A))
+            (EQUAL (LAST (APPEND GENRL1 (CONS A1 NIL)))
+                   A1)
+            T)
+      T)
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND A
+           (COND (EQUAL (LAST NIL) (CAR A))
+                 (EQUAL (LAST (APPEND NIL (CONS A1 NIL)))
+                        A1)
+                 T)
+           T)
+     (IMPLIES (COND A
+                    (COND (EQUAL (LAST GENRL1) (CAR A))
+                          (EQUAL (LAST (APPEND GENRL1 (CONS A1 NIL)))
+                                 A1)
+                          T)
+                    T)
+              (COND A
+                    (COND (EQUAL (LAST (CONS GENRL2 GENRL1))
+                                 (CAR A))
+                          (EQUAL (LAST (APPEND (CONS GENRL2 GENRL1)
+                                               (CONS A1 NIL)))
+                                 A1)
+                          T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND A
+      (COND (EQUAL (LAST GENRL1) (CAR A))
+            (COND (EQUAL (LAST (APPEND GENRL1 (CONS A1 NIL)))
+                         A1)
+                  (COND GENRL1
+                        (COND (APPEND GENRL1 (CONS A1 NIL))
+                              T (EQUAL GENRL2 A1))
+                        T)
+                  T)
+            T)
+      T).
+
+FERTILIZE WITH (EQUAL (LAST (APPEND GENRL1 (CONS A1 NIL))) A1).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A
+      (COND (EQUAL (LAST GENRL1) (CAR A))
+            (COND GENRL1
+                  (COND (APPEND GENRL1
+                                (CONS (LAST (APPEND GENRL1 (CONS A1 NIL)))
+                                      NIL))
+                        T
+                        (EQUAL GENRL2
+                               (LAST (APPEND GENRL1 (CONS A1 NIL)))))
+                  T)
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+ (COND A
+       (COND (EQUAL (LAST NIL) (CAR A))
+             (COND NIL
+                   (COND (APPEND NIL
+                                 (CONS (LAST (APPEND NIL (CONS A1 NIL)))
+                                       NIL))
+                         T
+                         (EQUAL GENRL2
+                                (LAST (APPEND NIL (CONS A1 NIL)))))
+                   T)
+             T)
+       T)
+ (IMPLIES
+   (COND A
+         (COND (EQUAL (LAST GENRL1) (CAR A))
+               (COND GENRL1
+                     (COND (APPEND GENRL1
+                                   (CONS (LAST (APPEND GENRL1 (CONS A1 NIL)))
+                                         NIL))
+                           T
+                           (EQUAL GENRL2
+                                  (LAST (APPEND GENRL1 (CONS A1 NIL)))))
+                     T)
+               T)
+         T)
+   (COND A
+         (COND (EQUAL (LAST (CONS GENRL3 GENRL1))
+                      (CAR A))
+               (COND (CONS GENRL3 GENRL1)
+                     (COND (APPEND (CONS GENRL3 GENRL1)
+                                   (CONS (LAST (APPEND (CONS GENRL3 GENRL1)
+                                                       (CONS A1 NIL)))
+                                         NIL))
+                           T
+                           (EQUAL GENRL2
+                                  (LAST (APPEND (CONS GENRL3 GENRL1)
+                                                (CONS A1 NIL)))))
+                     T)
+               T)
+         T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-8
+               (IMPLIES (MEMBER A B)
+                        (MEMBER A (APPEND B C))))
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B)
+      (MEMBER A (APPEND B C))
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (MEMBER A NIL)
+           (MEMBER A (APPEND NIL C))
+           T)
+     (IMPLIES (COND (MEMBER A B)
+                    (MEMBER A (APPEND B C))
+                    T)
+              (COND (MEMBER A (CONS B1 B))
+                    (MEMBER A (APPEND (CONS B1 B) C))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-9
+               (IMPLIES (MEMBER A B)
+                        (MEMBER A (APPEND C B))))
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B)
+      (MEMBER A (APPEND C B))
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON C.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (MEMBER A B)
+           (MEMBER A (APPEND NIL B))
+           T)
+     (IMPLIES (COND (MEMBER A B)
+                    (MEMBER A (APPEND C B))
+                    T)
+              (COND (MEMBER A B)
+                    (MEMBER A (APPEND (CONS C1 C) B))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-10
+               (IMPLIES (AND (NOT (EQUAL A (CAR B)))
+                             (MEMBER A B))
+                        (MEMBER A (CDR B))))
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL A (CAR B))
+      T
+      (COND (MEMBER A B)
+            (MEMBER A (CDR B))
+            T)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (EQUAL A (CAR NIL))
+           T
+           (COND (MEMBER A NIL)
+                 (MEMBER A (CDR NIL))
+                 T))
+     (IMPLIES (COND (EQUAL A (CAR B))
+                    T
+                    (COND (MEMBER A B)
+                          (MEMBER A (CDR B))
+                          T))
+              (COND (EQUAL A (CAR (CONS B1 B)))
+                    T
+                    (COND (MEMBER A (CONS B1 B))
+                          (MEMBER A (CDR (CONS B1 B)))
+                          T)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-11
+               (IMPLIES (OR (MEMBER A B) (MEMBER A C))
+                        (MEMBER A (APPEND B C))))
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B)
+      (MEMBER A (APPEND B C))
+      (COND (MEMBER A C)
+            (MEMBER A (APPEND B C))
+            T)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (MEMBER A NIL)
+           (MEMBER A (APPEND NIL C))
+           (COND (MEMBER A C)
+                 (MEMBER A (APPEND NIL C))
+                 T))
+     (IMPLIES (COND (MEMBER A B)
+                    (MEMBER A (APPEND B C))
+                    (COND (MEMBER A C)
+                          (MEMBER A (APPEND B C))
+                          T))
+              (COND (MEMBER A (CONS B1 B))
+                    (MEMBER A (APPEND (CONS B1 B) C))
+                    (COND (MEMBER A C)
+                          (MEMBER A (APPEND (CONS B1 B) C))
+                          T)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-12
+               (IMPLIES (AND (MEMBER A B) (MEMBER A C))
+                        (MEMBER A (INTERSECT B C))))
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B)
+      (COND (MEMBER A C)
+            (MEMBER A (INTERSECT B C))
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (MEMBER A NIL)
+           (COND (MEMBER A C)
+                 (MEMBER A (INTERSECT NIL C))
+                 T)
+           T)
+     (IMPLIES (COND (MEMBER A B)
+                    (COND (MEMBER A C)
+                          (MEMBER A (INTERSECT B C))
+                          T)
+                    T)
+              (COND (MEMBER A (CONS B1 B))
+                    (COND (MEMBER A C)
+                          (MEMBER A (INTERSECT (CONS B1 B) C))
+                          T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B)
+      T
+      (COND (EQUAL A B1)
+            (COND (MEMBER A C)
+                  (COND (MEMBER B1 C)
+                        T (MEMBER A (INTERSECT B C)))
+                  T)
+            T)).
+
+FERTILIZE WITH (EQUAL A B1).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (MEMBER A B)
+      T
+      (COND (MEMBER A C)
+            (COND (MEMBER A C)
+                  T (MEMBER A (INTERSECT B C)))
+            T)).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-13
+               (IMPLIES (OR (MEMBER A B) (MEMBER A C))
+                        (MEMBER A (UNION B C))))
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B)
+      (MEMBER A (UNION B C))
+      (COND (MEMBER A C)
+            (MEMBER A (UNION B C))
+            T)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (MEMBER A NIL)
+           (MEMBER A (UNION NIL C))
+           (COND (MEMBER A C)
+                 (MEMBER A (UNION NIL C))
+                 T))
+     (IMPLIES (COND (MEMBER A B)
+                    (MEMBER A (UNION B C))
+                    (COND (MEMBER A C)
+                          (MEMBER A (UNION B C))
+                          T))
+              (COND (MEMBER A (CONS B1 B))
+                    (MEMBER A (UNION (CONS B1 B) C))
+                    (COND (MEMBER A C)
+                          (MEMBER A (UNION (CONS B1 B) C))
+                          T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B)
+      T
+      (COND (MEMBER A C)
+            T
+            (COND (EQUAL A B1)
+                  (COND (MEMBER B1 C)
+                        (MEMBER A (UNION B C))
+                        T)
+                  T))).
+
+FERTILIZE WITH (EQUAL A B1).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (MEMBER A B)
+      T
+      (COND (MEMBER A C)
+            T
+            (COND (MEMBER A C)
+                  (MEMBER A (UNION B C))
+                  T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-14
+               (IMPLIES (SUBSET A B)
+                        (EQUAL (UNION A B) B)))
+WHICH IS EQUIVALENT TO:
+(COND (SUBSET A B)
+      (EQUAL (UNION A B) B)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (SUBSET NIL B)
+           (EQUAL (UNION NIL B) B)
+           T)
+     (IMPLIES (COND (SUBSET A B)
+                    (EQUAL (UNION A B) B)
+                    T)
+              (COND (SUBSET (CONS A1 A) B)
+                    (EQUAL (UNION (CONS A1 A) B) B)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-15
+               (IMPLIES (SUBSET A B)
+                        (EQUAL (INTERSECT A B) A)))
+WHICH IS EQUIVALENT TO:
+(COND (SUBSET A B)
+      (EQUAL (INTERSECT A B) A)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (SUBSET NIL B)
+           (EQUAL (INTERSECT NIL B) NIL)
+           T)
+     (IMPLIES (COND (SUBSET A B)
+                    (EQUAL (INTERSECT A B) A)
+                    T)
+              (COND (SUBSET (CONS A1 A) B)
+                    (EQUAL (INTERSECT (CONS A1 A) B)
+                           (CONS A1 A))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-16
+               (EQUAL (MEMBER A B)
+                      (NOT (EQUAL (ASSOC A (PAIRLIST B C)) NIL))))
+WHICH IS EQUIVALENT TO:
+(COND (ASSOC A (PAIRLIST B C))
+      (MEMBER A B)
+      (COND (MEMBER A B) NIL T)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON C AND B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (ASSOC A (PAIRLIST B NIL))
+                (MEMBER A B)
+                (COND (MEMBER A B) NIL T))
+          (COND (ASSOC A (PAIRLIST NIL C))
+                (MEMBER A NIL)
+                (COND (MEMBER A NIL) NIL T)))
+     (IMPLIES (COND (ASSOC A (PAIRLIST B C))
+                    (MEMBER A B)
+                    (COND (MEMBER A B) NIL T))
+              (COND (ASSOC A (PAIRLIST (CONS B1 B) (CONS C1 C)))
+                    (MEMBER A (CONS B1 B))
+                    (COND (MEMBER A (CONS B1 B)) NIL T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (ASSOC A (PAIRLIST B NIL))
+      (MEMBER A B)
+      (COND (MEMBER A B) NIL T)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (ASSOC A (PAIRLIST NIL NIL))
+           (MEMBER A NIL)
+           (COND (MEMBER A NIL) NIL T))
+     (IMPLIES (COND (ASSOC A (PAIRLIST B NIL))
+                    (MEMBER A B)
+                    (COND (MEMBER A B) NIL T))
+              (COND (ASSOC A (PAIRLIST (CONS B1 B) NIL))
+                    (MEMBER A (CONS B1 B))
+                    (COND (MEMBER A (CONS B1 B)) NIL T)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-17
+               (EQUAL (MAPLIST (APPEND A B) C)
+                      (APPEND (MAPLIST A C) (MAPLIST B C))))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (MAPLIST (APPEND NIL B) C)
+            (APPEND (MAPLIST NIL C) (MAPLIST B C)))
+     (IMPLIES (EQUAL (MAPLIST (APPEND A B) C)
+                     (APPEND (MAPLIST A C) (MAPLIST B C)))
+              (EQUAL (MAPLIST (APPEND (CONS A1 A) B) C)
+                     (APPEND (MAPLIST (CONS A1 A) C)
+                             (MAPLIST B C))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-18
+               (EQUAL (LENGTH (MAPLIST A B))
+                      (LENGTH A)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LENGTH (MAPLIST NIL B))
+            (LENGTH NIL))
+     (IMPLIES (EQUAL (LENGTH (MAPLIST A B))
+                     (LENGTH A))
+              (EQUAL (LENGTH (MAPLIST (CONS A1 A) B))
+                     (LENGTH (CONS A1 A))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-19
+               (EQUAL (REVERSE (MAPLIST A B))
+                      (MAPLIST (REVERSE A) B)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (REVERSE (MAPLIST NIL B))
+            (MAPLIST (REVERSE NIL) B))
+     (IMPLIES (EQUAL (REVERSE (MAPLIST A B))
+                     (MAPLIST (REVERSE A) B))
+              (EQUAL (REVERSE (MAPLIST (CONS A1 A) B))
+                     (MAPLIST (REVERSE (CONS A1 A)) B)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (REVERSE (MAPLIST A B))
+             (MAPLIST (REVERSE A) B))
+      (EQUAL (APPEND (REVERSE (MAPLIST A B))
+                     (CONS (APPLY B A1) NIL))
+             (MAPLIST (APPEND (REVERSE A) (CONS A1 NIL))
+                      B))
+      T).
+
+FERTILIZE WITH (EQUAL (REVERSE (MAPLIST A B)) (MAPLIST (REVERSE A) B)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (APPEND (MAPLIST (REVERSE A) B)
+               (CONS (APPLY B A1) NIL))
+       (MAPLIST (APPEND (REVERSE A) (CONS A1 NIL))
+                B)).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (REVERSE A) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(EQUAL (APPEND (MAPLIST GENRL1 B)
+               (CONS (APPLY B A1) NIL))
+       (MAPLIST (APPEND GENRL1 (CONS A1 NIL))
+                B))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (APPEND (MAPLIST NIL B)
+                    (CONS (APPLY B A1) NIL))
+            (MAPLIST (APPEND NIL (CONS A1 NIL)) B))
+     (IMPLIES (EQUAL (APPEND (MAPLIST GENRL1 B)
+                             (CONS (APPLY B A1) NIL))
+                     (MAPLIST (APPEND GENRL1 (CONS A1 NIL))
+                              B))
+              (EQUAL (APPEND (MAPLIST (CONS GENRL2 GENRL1) B)
+                             (CONS (APPLY B A1) NIL))
+                     (MAPLIST (APPEND (CONS GENRL2 GENRL1)
+                                      (CONS A1 NIL))
+                              B)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-20
+               (EQUAL (LIT (APPEND A B) C D)
+                      (LIT A (LIT B C D) D)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LIT (APPEND NIL B) C D)
+            (LIT NIL (LIT B C D) D))
+     (IMPLIES (EQUAL (LIT (APPEND A B) C D)
+                     (LIT A (LIT B C D) D))
+              (EQUAL (LIT (APPEND (CONS A1 A) B) C D)
+                     (LIT (CONS A1 A) (LIT B C D) D)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (LIT (APPEND A B) C D)
+             (LIT A (LIT B C D) D))
+      (EQUAL (APPLY2 D A1 (LIT (APPEND A B) C D))
+             (APPLY2 D A1 (LIT A (LIT B C D) D)))
+      T).
+
+FERTILIZE WITH (EQUAL (LIT (APPEND A B) C D) (LIT A (LIT B C D) D)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (APPLY2 D A1 (LIT (APPEND A B) C D))
+       (APPLY2 D A1 (LIT (APPEND A B) C D))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-21
+               (IMPLIES (AND (BOOLEAN A) (BOOLEAN B))
+                        (EQUAL (AND (IMPLIES A B) (IMPLIES B A))
+                               (EQUAL A B))))
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-22
+               (EQUAL (ELEMENT B A)
+                      (ELEMENT (APPEND C B) (APPEND C A))))
+MUST TRY INDUCTION.
+
+INDUCT ON C.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (ELEMENT B A)
+            (ELEMENT (APPEND NIL B) (APPEND NIL A)))
+     (IMPLIES (EQUAL (ELEMENT B A)
+                     (ELEMENT (APPEND C B) (APPEND C A)))
+              (EQUAL (ELEMENT B A)
+                     (ELEMENT (APPEND (CONS C1 C) B)
+                              (APPEND (CONS C1 C) A))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-23
+               (IMPLIES (ELEMENT B A)
+                        (MEMBER (ELEMENT B A) A)))
+WHICH IS EQUIVALENT TO:
+(COND (ELEMENT B A)
+      (MEMBER (ELEMENT B A) A)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A AND B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (ELEMENT B NIL)
+                (MEMBER (ELEMENT B NIL) NIL)
+                T)
+          (COND (ELEMENT NIL A)
+                (MEMBER (ELEMENT NIL A) A)
+                T))
+     (IMPLIES (COND (ELEMENT B A)
+                    (MEMBER (ELEMENT B A) A)
+                    T)
+              (COND (ELEMENT (CONS B1 B) (CONS A1 A))
+                    (MEMBER (ELEMENT (CONS B1 B) (CONS A1 A))
+                            (CONS A1 A))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-24
+               (EQUAL (CDRN C (APPEND A B))
+                      (APPEND (CDRN C A)
+                              (CDRN (CDRN A C) B))))
+MUST TRY INDUCTION.
+
+INDUCT ON C AND A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (EQUAL (CDRN NIL (APPEND A B))
+                 (APPEND (CDRN NIL A)
+                         (CDRN (CDRN A NIL) B)))
+          (EQUAL (CDRN C (APPEND NIL B))
+                 (APPEND (CDRN C NIL)
+                         (CDRN (CDRN NIL C) B))))
+     (IMPLIES (EQUAL (CDRN C (APPEND A B))
+                     (APPEND (CDRN C A) (CDRN (CDRN A C) B)))
+              (EQUAL (CDRN (CONS C1 C)
+                           (APPEND (CONS A1 A) B))
+                     (APPEND (CDRN (CONS C1 C) (CONS A1 A))
+                             (CDRN (CDRN (CONS A1 A) (CONS C1 C))
+                                   B))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-25
+               (EQUAL (CDRN (APPEND B C) A)
+                      (CDRN C (CDRN B A))))
+MUST TRY INDUCTION.
+
+INDUCT ON A AND B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (EQUAL (CDRN (APPEND B C) NIL)
+                 (CDRN C (CDRN B NIL)))
+          (EQUAL (CDRN (APPEND NIL C) A)
+                 (CDRN C (CDRN NIL A))))
+     (IMPLIES (EQUAL (CDRN (APPEND B C) A)
+                     (CDRN C (CDRN B A)))
+              (EQUAL (CDRN (APPEND (CONS B1 B) C)
+                           (CONS A1 A))
+                     (CDRN C (CDRN (CONS B1 B) (CONS A1 A)))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-26 (EQUAL (EQUAL A B) (EQUAL B A)))
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL A B)
+      (EQUAL B A)
+      (COND (EQUAL B A) NIL T)).
+
+FERTILIZE WITH (EQUAL A B).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL A A)
+      (COND (COND (EQUAL B A) NIL T)
+            T (EQUAL A B))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL B A) (EQUAL A B) T).
+
+FERTILIZE WITH (EQUAL B A).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL B B).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-27
+               (IMPLIES (AND (EQUAL A B) (EQUAL B C))
+                        (EQUAL A C)))
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL A B)
+      (COND (EQUAL B C) (EQUAL A C) T)
+      T).
+
+FERTILIZE WITH (EQUAL A B).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL B C) (EQUAL B C) T).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-28
+               (IMPLIES (AND (BOOLEAN A)
+                             (AND (BOOLEAN B) (BOOLEAN C)))
+                        (EQUAL (EQUAL (EQUAL A B) C)
+                               (EQUAL A (EQUAL B C)))))
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-29 (EQUAL (ADD A B) (ADD B A)))
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (ADD A NIL) (ADD NIL A))
+     (IMPLIES (EQUAL (ADD A B) (ADD B A))
+              (EQUAL (ADD A (CONS B1 B))
+                     (ADD (CONS B1 B) A)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (ADD A NIL) (LENGTH A))
+      (COND (EQUAL (ADD A B) (ADD B A))
+            (EQUAL (ADD A (CONS B1 B))
+                   (CONS NIL (ADD B A)))
+            T)
+      NIL).
+
+FERTILIZE WITH (EQUAL (ADD A B) (ADD B A)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL (ADD A NIL) (LENGTH A))
+      (EQUAL (ADD A (CONS B1 B))
+             (CONS NIL (ADD A B)))
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (EQUAL (ADD NIL NIL) (LENGTH NIL))
+           (IMPLIES (EQUAL (ADD A NIL) (LENGTH A))
+                    (EQUAL (ADD (CONS A1 A) NIL)
+                           (LENGTH (CONS A1 A)))))
+      (EQUAL (ADD A2 (CONS B1 B))
+             (CONS NIL (ADD A2 B)))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(EQUAL (ADD A2 (CONS B1 B))
+       (CONS NIL (ADD A2 B))).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (ADD NIL (CONS B1 B))
+            (CONS NIL (ADD NIL B)))
+     (IMPLIES (EQUAL (ADD A2 (CONS B1 B))
+                     (CONS NIL (ADD A2 B)))
+              (EQUAL (ADD (CONS A3 A2) (CONS B1 B))
+                     (CONS NIL (ADD (CONS A3 A2) B))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-30
+               (EQUAL (ADD A (ADD B C))
+                      (ADD (ADD A B) C)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (ADD NIL (ADD B C))
+            (ADD (ADD NIL B) C))
+     (IMPLIES (EQUAL (ADD A (ADD B C))
+                     (ADD (ADD A B) C))
+              (EQUAL (ADD (CONS A1 A) (ADD B C))
+                     (ADD (ADD (CONS A1 A) B) C)))).
+
+WHICH IS EQUIVALENT TO:
+(EQUAL (LENGTH (ADD B C))
+       (ADD (LENGTH B) C)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LENGTH (ADD NIL C))
+            (ADD (LENGTH NIL) C))
+     (IMPLIES (EQUAL (LENGTH (ADD B C))
+                     (ADD (LENGTH B) C))
+              (EQUAL (LENGTH (ADD (CONS B1 B) C))
+                     (ADD (LENGTH (CONS B1 B)) C)))).
+
+WHICH IS EQUIVALENT TO:
+(EQUAL (LENGTH (LENGTH C)) (LENGTH C)).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (LENGTH C) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL1) (EQUAL (LENGTH GENRL1) GENRL1))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP NIL)
+              (EQUAL (LENGTH NIL) NIL))
+     (IMPLIES (IMPLIES (NUMBERP GENRL1)
+                       (EQUAL (LENGTH GENRL1) GENRL1))
+              (IMPLIES (NUMBERP (CONS GENRL2 GENRL1))
+                       (EQUAL (LENGTH (CONS GENRL2 GENRL1))
+                              (CONS GENRL2 GENRL1))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-31 (EQUAL (MULT A B) (MULT B A)))
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (MULT A NIL) (MULT NIL A))
+     (IMPLIES (EQUAL (MULT A B) (MULT B A))
+              (EQUAL (MULT A (CONS B1 B))
+                     (MULT (CONS B1 B) A)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (MULT A NIL)
+      NIL
+      (COND (EQUAL (MULT A B) (MULT B A))
+            (EQUAL (MULT A (CONS B1 B))
+                   (ADD A (MULT B A)))
+            T)).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (NOT (MULT NIL NIL))
+           (IMPLIES (NOT (MULT A NIL))
+                    (NOT (MULT (CONS A1 A) NIL))))
+      (COND (EQUAL (MULT A2 B) (MULT B A2))
+            (EQUAL (MULT A2 (CONS B1 B))
+                   (ADD A2 (MULT B A2)))
+            T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (LENGTH (MULT A NIL))
+            (COND (MULT A NIL) T NIL)
+            T)
+      (COND (EQUAL (MULT A2 B) (MULT B A2))
+            (EQUAL (MULT A2 (CONS B1 B))
+                   (ADD A2 (MULT B A2)))
+            T)
+      NIL).
+
+FERTILIZE WITH (EQUAL (MULT A2 B) (MULT B A2)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (COND (LENGTH (MULT A NIL))
+            (COND (MULT A NIL) T NIL)
+            T)
+      (EQUAL (MULT A2 (CONS B1 B))
+             (ADD A2 (MULT A2 B)))
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+GENERALIZE COMMON SUBTERM BY REPLACING (MULT A NIL) BY GENRL1.
+
+THE GENERALIZED (first conjunct) TERM IS:
+(IMPLIES (NUMBERP GENRL1) (COND (LENGTH GENRL1) (COND GENRL1 T NIL) T))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (IMPLIES (NUMBERP NIL)
+                    (COND (LENGTH NIL) (COND NIL T NIL) T))
+           (IMPLIES (IMPLIES (NUMBERP GENRL1)
+                             (COND (LENGTH GENRL1)
+                                   (COND GENRL1 T NIL)
+                                   T))
+                    (IMPLIES (NUMBERP (CONS GENRL2 GENRL1))
+                             (COND (LENGTH (CONS GENRL2 GENRL1))
+                                   (COND (CONS GENRL2 GENRL1) T NIL)
+                                   T))))
+      (EQUAL (MULT A2 (CONS B1 B))
+             (ADD A2 (MULT A2 B)))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(EQUAL (MULT A2 (CONS B1 B))
+       (ADD A2 (MULT A2 B))).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (MULT NIL (CONS B1 B))
+            (ADD NIL (MULT NIL B)))
+     (IMPLIES (EQUAL (MULT A2 (CONS B1 B))
+                     (ADD A2 (MULT A2 B)))
+              (EQUAL (MULT (CONS A3 A2) (CONS B1 B))
+                     (ADD (CONS A3 A2)
+                          (MULT (CONS A3 A2) B))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (MULT A2 (CONS B1 B))
+             (ADD A2 (MULT A2 B)))
+      (EQUAL (ADD B (MULT A2 (CONS B1 B)))
+             (ADD A2 (ADD B (MULT A2 B))))
+      T).
+
+FERTILIZE WITH (EQUAL (MULT A2 (CONS B1 B)) (ADD A2 (MULT A2 B))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (ADD B (ADD A2 (MULT A2 B)))
+       (ADD A2 (ADD B (MULT A2 B)))).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (MULT A2 B) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL1)
+         (EQUAL (ADD B (ADD A2 GENRL1))
+                (ADD A2 (ADD B GENRL1))))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON A2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP GENRL1)
+              (EQUAL (ADD B (ADD NIL GENRL1))
+                     (ADD NIL (ADD B GENRL1))))
+     (IMPLIES (IMPLIES (NUMBERP GENRL1)
+                       (EQUAL (ADD B (ADD A2 GENRL1))
+                              (ADD A2 (ADD B GENRL1))))
+              (IMPLIES (NUMBERP GENRL1)
+                       (EQUAL (ADD B (ADD (CONS A3 A2) GENRL1))
+                              (ADD (CONS A3 A2) (ADD B GENRL1)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (NUMBERP GENRL1)
+            (EQUAL (ADD B (LENGTH GENRL1))
+                   (LENGTH (ADD B GENRL1)))
+            T)
+      (COND (NUMBERP GENRL1)
+            (COND (EQUAL (ADD B (ADD A2 GENRL1))
+                         (ADD A2 (ADD B GENRL1)))
+                  (EQUAL (ADD B (CONS NIL (ADD A2 GENRL1)))
+                         (CONS NIL (ADD A2 (ADD B GENRL1))))
+                  T)
+            T)
+      NIL).
+
+FERTILIZE WITH (EQUAL (ADD B (ADD A2 GENRL1)) (ADD A2 (ADD B GENRL1))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (COND (NUMBERP GENRL1)
+            (EQUAL (ADD B (LENGTH GENRL1))
+                   (LENGTH (ADD B GENRL1)))
+            T)
+      (COND (NUMBERP GENRL1)
+            (EQUAL (ADD B (CONS NIL (ADD A2 GENRL1)))
+                   (CONS NIL (ADD B (ADD A2 GENRL1))))
+            T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (COND (NUMBERP GENRL1)
+                 (EQUAL (ADD NIL (LENGTH GENRL1))
+                        (LENGTH (ADD NIL GENRL1)))
+                 T)
+           (IMPLIES (COND (NUMBERP GENRL1)
+                          (EQUAL (ADD B (LENGTH GENRL1))
+                                 (LENGTH (ADD B GENRL1)))
+                          T)
+                    (COND (NUMBERP GENRL1)
+                          (EQUAL (ADD (CONS B1 B) (LENGTH GENRL1))
+                                 (LENGTH (ADD (CONS B1 B) GENRL1)))
+                          T)))
+      (COND (NUMBERP GENRL1)
+            (EQUAL (ADD B2 (CONS NIL (ADD A2 GENRL1)))
+                   (CONS NIL (ADD B2 (ADD A2 GENRL1))))
+            T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP GENRL1)
+      (EQUAL (ADD B2 (CONS NIL (ADD A2 GENRL1)))
+             (CONS NIL (ADD B2 (ADD A2 GENRL1))))
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (ADD A2 GENRL1) BY GENRL2.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL2)
+         (COND (NUMBERP GENRL1)
+               (EQUAL (ADD B2 (CONS NIL GENRL2))
+                      (CONS NIL (ADD B2 GENRL2)))
+               T))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON B2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP GENRL2)
+              (COND (NUMBERP GENRL1)
+                    (EQUAL (ADD NIL (CONS NIL GENRL2))
+                           (CONS NIL (ADD NIL GENRL2)))
+                    T))
+     (IMPLIES (IMPLIES (NUMBERP GENRL2)
+                       (COND (NUMBERP GENRL1)
+                             (EQUAL (ADD B2 (CONS NIL GENRL2))
+                                    (CONS NIL (ADD B2 GENRL2)))
+                             T))
+              (IMPLIES (NUMBERP GENRL2)
+                       (COND (NUMBERP GENRL1)
+                             (EQUAL (ADD (CONS B3 B2) (CONS NIL GENRL2))
+                                    (CONS NIL (ADD (CONS B3 B2) GENRL2)))
+                             T)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-32
+               (EQUAL (MULT A (ADD B C))
+                      (ADD (MULT A B) (MULT A C))))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (MULT NIL (ADD B C))
+            (ADD (MULT NIL B) (MULT NIL C)))
+     (IMPLIES (EQUAL (MULT A (ADD B C))
+                     (ADD (MULT A B) (MULT A C)))
+              (EQUAL (MULT (CONS A1 A) (ADD B C))
+                     (ADD (MULT (CONS A1 A) B)
+                          (MULT (CONS A1 A) C))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (MULT A (ADD B C))
+             (ADD (MULT A B) (MULT A C)))
+      (EQUAL (ADD (ADD B C) (MULT A (ADD B C)))
+             (ADD (ADD B (MULT A B))
+                  (ADD C (MULT A C))))
+      T).
+
+FERTILIZE WITH (EQUAL (MULT A (ADD B C)) (ADD (MULT A B) (MULT A C))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (ADD (ADD B C)
+            (ADD (MULT A B) (MULT A C)))
+       (ADD (ADD B (MULT A B))
+            (ADD C (MULT A C)))).
+
+GENERALIZE COMMON SUBTERMS BY REPLACING (MULT A C) BY GENRL1 AND (MULT A B)
+BY GENRL2.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL1)
+         (IMPLIES (NUMBERP GENRL2)
+                  (EQUAL (ADD (ADD B C) (ADD GENRL2 GENRL1))
+                         (ADD (ADD B GENRL2) (ADD C GENRL1)))))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP GENRL1)
+              (IMPLIES (NUMBERP GENRL2)
+                       (EQUAL (ADD (ADD NIL C) (ADD GENRL2 GENRL1))
+                              (ADD (ADD NIL GENRL2) (ADD C GENRL1)))))
+     (IMPLIES (IMPLIES (NUMBERP GENRL1)
+                       (IMPLIES (NUMBERP GENRL2)
+                                (EQUAL (ADD (ADD B C) (ADD GENRL2 GENRL1))
+                                       (ADD (ADD B GENRL2) (ADD C GENRL1)))))
+              (IMPLIES (NUMBERP GENRL1)
+                       (IMPLIES (NUMBERP GENRL2)
+                                (EQUAL (ADD (ADD (CONS B1 B) C)
+                                            (ADD GENRL2 GENRL1))
+                                       (ADD (ADD (CONS B1 B) GENRL2)
+                                            (ADD C GENRL1))))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP GENRL1)
+      (COND (NUMBERP GENRL2)
+            (EQUAL (ADD (LENGTH C) (ADD GENRL2 GENRL1))
+                   (ADD (LENGTH GENRL2) (ADD C GENRL1)))
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (NUMBERP GENRL1)
+           (COND (NUMBERP NIL)
+                 (EQUAL (ADD (LENGTH C) (ADD NIL GENRL1))
+                        (ADD (LENGTH NIL) (ADD C GENRL1)))
+                 T)
+           T)
+     (IMPLIES (COND (NUMBERP GENRL1)
+                    (COND (NUMBERP GENRL2)
+                          (EQUAL (ADD (LENGTH C) (ADD GENRL2 GENRL1))
+                                 (ADD (LENGTH GENRL2) (ADD C GENRL1)))
+                          T)
+                    T)
+              (COND (NUMBERP GENRL1)
+                    (COND (NUMBERP (CONS GENRL3 GENRL2))
+                          (EQUAL (ADD (LENGTH C)
+                                      (ADD (CONS GENRL3 GENRL2) GENRL1))
+                                 (ADD (LENGTH (CONS GENRL3 GENRL2))
+                                      (ADD C GENRL1)))
+                          T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (COND (NUMBERP GENRL1)
+       (EQUAL (ADD (LENGTH C) (LENGTH GENRL1))
+              (LENGTH (ADD C GENRL1)))
+       T)
+ (COND (NUMBERP GENRL1)
+       (COND (NUMBERP GENRL2)
+             (COND (EQUAL (ADD (LENGTH C) (ADD GENRL2 GENRL1))
+                          (ADD (LENGTH GENRL2) (ADD C GENRL1)))
+                   (COND GENRL3 T
+                         (EQUAL (ADD (LENGTH C)
+                                     (CONS NIL (ADD GENRL2 GENRL1)))
+                                (CONS NIL
+                                      (ADD (LENGTH GENRL2) (ADD C GENRL1)))))
+                   T)
+             T)
+       T)
+ NIL).
+
+FERTILIZE WITH 
+(EQUAL (ADD (LENGTH C) (ADD GENRL2 GENRL1))
+       (ADD (LENGTH GENRL2) (ADD C GENRL1))).
+
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (COND (NUMBERP GENRL1)
+            (EQUAL (ADD (LENGTH C) (LENGTH GENRL1))
+                   (LENGTH (ADD C GENRL1)))
+            T)
+      (COND (NUMBERP GENRL1)
+            (COND (NUMBERP GENRL2)
+                  (COND GENRL3 T
+                        (EQUAL (ADD (LENGTH C)
+                                    (CONS NIL (ADD GENRL2 GENRL1)))
+                               (CONS NIL
+                                     (ADD (LENGTH C) (ADD GENRL2 GENRL1)))))
+                  T)
+            T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON C.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (COND (NUMBERP GENRL1)
+                 (EQUAL (ADD (LENGTH NIL) (LENGTH GENRL1))
+                        (LENGTH (ADD NIL GENRL1)))
+                 T)
+           (IMPLIES (COND (NUMBERP GENRL1)
+                          (EQUAL (ADD (LENGTH C) (LENGTH GENRL1))
+                                 (LENGTH (ADD C GENRL1)))
+                          T)
+                    (COND (NUMBERP GENRL1)
+                          (EQUAL (ADD (LENGTH (CONS C1 C))
+                                      (LENGTH GENRL1))
+                                 (LENGTH (ADD (CONS C1 C) GENRL1)))
+                          T)))
+      (COND (NUMBERP GENRL1)
+            (COND (NUMBERP GENRL2)
+                  (COND GENRL3 T
+                        (EQUAL (ADD (LENGTH C2)
+                                    (CONS NIL (ADD GENRL2 GENRL1)))
+                               (CONS NIL
+                                     (ADD (LENGTH C2) (ADD GENRL2 GENRL1)))))
+                  T)
+            T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP GENRL1)
+      (COND (NUMBERP GENRL2)
+            (COND GENRL3 T
+                  (EQUAL (ADD (LENGTH C2)
+                              (CONS NIL (ADD GENRL2 GENRL1)))
+                         (CONS NIL
+                               (ADD (LENGTH C2) (ADD GENRL2 GENRL1)))))
+            T)
+      T).
+
+GENERALIZE COMMON SUBTERMS BY REPLACING (ADD GENRL2 GENRL1) BY GENRL4
+AND (LENGTH C2) BY GENRL5.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL4)
+         (IMPLIES (NUMBERP GENRL5)
+                  (COND (NUMBERP GENRL1)
+                        (COND (NUMBERP GENRL2)
+                              (COND GENRL3 T
+                                    (EQUAL (ADD GENRL5 (CONS NIL GENRL4))
+                                           (CONS NIL (ADD GENRL5 GENRL4))))
+                              T)
+                        T)))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL5.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+ (IMPLIES (NUMBERP GENRL4)
+          (IMPLIES (NUMBERP NIL)
+                   (COND (NUMBERP GENRL1)
+                         (COND (NUMBERP GENRL2)
+                               (COND GENRL3 T
+                                     (EQUAL (ADD NIL (CONS NIL GENRL4))
+                                            (CONS NIL (ADD NIL GENRL4))))
+                               T)
+                         T)))
+ (IMPLIES
+  (IMPLIES (NUMBERP GENRL4)
+           (IMPLIES (NUMBERP GENRL5)
+                    (COND (NUMBERP GENRL1)
+                          (COND (NUMBERP GENRL2)
+                                (COND GENRL3 T
+                                      (EQUAL (ADD GENRL5 (CONS NIL GENRL4))
+                                             (CONS NIL (ADD GENRL5 GENRL4))))
+                                T)
+                          T)))
+  (IMPLIES
+   (NUMBERP GENRL4)
+   (IMPLIES
+      (NUMBERP (CONS GENRL6 GENRL5))
+      (COND (NUMBERP GENRL1)
+            (COND (NUMBERP GENRL2)
+                  (COND GENRL3 T
+                        (EQUAL (ADD (CONS GENRL6 GENRL5)
+                                    (CONS NIL GENRL4))
+                               (CONS NIL (ADD (CONS GENRL6 GENRL5) GENRL4))))
+                  T)
+            T))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-33
+               (EQUAL (MULT A (MULT B C))
+                      (MULT (MULT A B) C)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (MULT NIL (MULT B C))
+            (MULT (MULT NIL B) C))
+     (IMPLIES (EQUAL (MULT A (MULT B C))
+                     (MULT (MULT A B) C))
+              (EQUAL (MULT (CONS A1 A) (MULT B C))
+                     (MULT (MULT (CONS A1 A) B) C)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (MULT A (MULT B C))
+             (MULT (MULT A B) C))
+      (EQUAL (ADD (MULT B C) (MULT A (MULT B C)))
+             (MULT (ADD B (MULT A B)) C))
+      T).
+
+FERTILIZE WITH (EQUAL (MULT A (MULT B C)) (MULT (MULT A B) C)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (ADD (MULT B C) (MULT (MULT A B) C))
+       (MULT (ADD B (MULT A B)) C)).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (MULT A B) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL1)
+         (EQUAL (ADD (MULT B C) (MULT GENRL1 C))
+                (MULT (ADD B GENRL1) C)))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP GENRL1)
+              (EQUAL (ADD (MULT NIL C) (MULT GENRL1 C))
+                     (MULT (ADD NIL GENRL1) C)))
+     (IMPLIES (IMPLIES (NUMBERP GENRL1)
+                       (EQUAL (ADD (MULT B C) (MULT GENRL1 C))
+                              (MULT (ADD B GENRL1) C)))
+              (IMPLIES (NUMBERP GENRL1)
+                       (EQUAL (ADD (MULT (CONS B1 B) C)
+                                   (MULT GENRL1 C))
+                              (MULT (ADD (CONS B1 B) GENRL1) C))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (NUMBERP GENRL1)
+            (EQUAL (LENGTH (MULT GENRL1 C))
+                   (MULT (LENGTH GENRL1) C))
+            T)
+      (COND (NUMBERP GENRL1)
+            (COND (EQUAL (ADD (MULT B C) (MULT GENRL1 C))
+                         (MULT (ADD B GENRL1) C))
+                  (EQUAL (ADD (ADD C (MULT B C)) (MULT GENRL1 C))
+                         (ADD C (MULT (ADD B GENRL1) C)))
+                  T)
+            T)
+      NIL).
+
+FERTILIZE WITH 
+(EQUAL (ADD (MULT B C) (MULT GENRL1 C)) (MULT (ADD B GENRL1) C)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (COND (NUMBERP GENRL1)
+            (EQUAL (LENGTH (MULT GENRL1 C))
+                   (MULT (LENGTH GENRL1) C))
+            T)
+      (COND (NUMBERP GENRL1)
+            (EQUAL (ADD (ADD C (MULT B C)) (MULT GENRL1 C))
+                   (ADD C (ADD (MULT B C) (MULT GENRL1 C))))
+            T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (COND (NUMBERP NIL)
+                 (EQUAL (LENGTH (MULT NIL C))
+                        (MULT (LENGTH NIL) C))
+                 T)
+           (IMPLIES (COND (NUMBERP GENRL1)
+                          (EQUAL (LENGTH (MULT GENRL1 C))
+                                 (MULT (LENGTH GENRL1) C))
+                          T)
+                    (COND (NUMBERP (CONS GENRL2 GENRL1))
+                          (EQUAL (LENGTH (MULT (CONS GENRL2 GENRL1) C))
+                                 (MULT (LENGTH (CONS GENRL2 GENRL1)) C))
+                          T)))
+      (COND (NUMBERP GENRL3)
+            (EQUAL (ADD (ADD C (MULT B C)) (MULT GENRL3 C))
+                   (ADD C (ADD (MULT B C) (MULT GENRL3 C))))
+            T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (NUMBERP GENRL1)
+            (COND (EQUAL (LENGTH (MULT GENRL1 C))
+                         (MULT (LENGTH GENRL1) C))
+                  (COND GENRL2 T
+                        (EQUAL (LENGTH (ADD C (MULT GENRL1 C)))
+                               (ADD C (MULT (LENGTH GENRL1) C))))
+                  T)
+            T)
+      (COND (NUMBERP GENRL3)
+            (EQUAL (ADD (ADD C (MULT B C)) (MULT GENRL3 C))
+                   (ADD C (ADD (MULT B C) (MULT GENRL3 C))))
+            T)
+      NIL).
+
+FERTILIZE WITH (EQUAL (LENGTH (MULT GENRL1 C)) (MULT (LENGTH GENRL1) C)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (COND (NUMBERP GENRL1)
+            (COND GENRL2 T
+                  (EQUAL (LENGTH (ADD C (MULT GENRL1 C)))
+                         (ADD C (LENGTH (MULT GENRL1 C)))))
+            T)
+      (COND (NUMBERP GENRL3)
+            (EQUAL (ADD (ADD C (MULT B C)) (MULT GENRL3 C))
+                   (ADD C (ADD (MULT B C) (MULT GENRL3 C))))
+            T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+GENERALIZE COMMON SUBTERM BY REPLACING (MULT GENRL1 C) BY GENRL4.
+
+THE GENERALIZED (first conjunct) TERM IS:
+(IMPLIES (NUMBERP GENRL4)
+         (COND (NUMBERP GENRL1)
+               (COND GENRL2 T
+                     (EQUAL (LENGTH (ADD C GENRL4))
+                            (ADD C (LENGTH GENRL4))))
+               T))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON C.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (AND
+     (IMPLIES (NUMBERP GENRL4)
+              (COND (NUMBERP GENRL1)
+                    (COND GENRL2 T
+                          (EQUAL (LENGTH (ADD NIL GENRL4))
+                                 (ADD NIL (LENGTH GENRL4))))
+                    T))
+     (IMPLIES (IMPLIES (NUMBERP GENRL4)
+                       (COND (NUMBERP GENRL1)
+                             (COND GENRL2 T
+                                   (EQUAL (LENGTH (ADD C GENRL4))
+                                          (ADD C (LENGTH GENRL4))))
+                             T))
+              (IMPLIES (NUMBERP GENRL4)
+                       (COND (NUMBERP GENRL1)
+                             (COND GENRL2 T
+                                   (EQUAL (LENGTH (ADD (CONS C1 C) GENRL4))
+                                          (ADD (CONS C1 C) (LENGTH GENRL4))))
+                             T))))
+ (COND (NUMBERP GENRL3)
+       (EQUAL (ADD (ADD C2 (MULT B C2))
+                   (MULT GENRL3 C2))
+              (ADD C2 (ADD (MULT B C2) (MULT GENRL3 C2))))
+       T)
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP GENRL3)
+      (EQUAL (ADD (ADD C2 (MULT B C2))
+                  (MULT GENRL3 C2))
+             (ADD C2 (ADD (MULT B C2) (MULT GENRL3 C2))))
+      T).
+
+GENERALIZE COMMON SUBTERMS BY REPLACING (MULT GENRL3 C2) BY GENRL4
+AND (MULT B C2) BY GENRL5.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL4)
+         (IMPLIES (NUMBERP GENRL5)
+                  (COND (NUMBERP GENRL3)
+                        (EQUAL (ADD (ADD C2 GENRL5) GENRL4)
+                               (ADD C2 (ADD GENRL5 GENRL4)))
+                        T)))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON C2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+  (IMPLIES (NUMBERP GENRL4)
+           (IMPLIES (NUMBERP GENRL5)
+                    (COND (NUMBERP GENRL3)
+                          (EQUAL (ADD (ADD NIL GENRL5) GENRL4)
+                                 (ADD NIL (ADD GENRL5 GENRL4)))
+                          T)))
+  (IMPLIES
+       (IMPLIES (NUMBERP GENRL4)
+                (IMPLIES (NUMBERP GENRL5)
+                         (COND (NUMBERP GENRL3)
+                               (EQUAL (ADD (ADD C2 GENRL5) GENRL4)
+                                      (ADD C2 (ADD GENRL5 GENRL4)))
+                               T)))
+       (IMPLIES (NUMBERP GENRL4)
+                (IMPLIES (NUMBERP GENRL5)
+                         (COND (NUMBERP GENRL3)
+                               (EQUAL (ADD (ADD (CONS C3 C2) GENRL5) GENRL4)
+                                      (ADD (CONS C3 C2) (ADD GENRL5 GENRL4)))
+                               T))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP GENRL4)
+      (COND (NUMBERP GENRL5)
+            (COND (NUMBERP GENRL3)
+                  (EQUAL (ADD (LENGTH GENRL5) GENRL4)
+                         (LENGTH (ADD GENRL5 GENRL4)))
+                  T)
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL5.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+    (COND (NUMBERP GENRL4)
+          (COND (NUMBERP NIL)
+                (COND (NUMBERP GENRL3)
+                      (EQUAL (ADD (LENGTH NIL) GENRL4)
+                             (LENGTH (ADD NIL GENRL4)))
+                      T)
+                T)
+          T)
+    (IMPLIES
+         (COND (NUMBERP GENRL4)
+               (COND (NUMBERP GENRL5)
+                     (COND (NUMBERP GENRL3)
+                           (EQUAL (ADD (LENGTH GENRL5) GENRL4)
+                                  (LENGTH (ADD GENRL5 GENRL4)))
+                           T)
+                     T)
+               T)
+         (COND (NUMBERP GENRL4)
+               (COND (NUMBERP (CONS GENRL6 GENRL5))
+                     (COND (NUMBERP GENRL3)
+                           (EQUAL (ADD (LENGTH (CONS GENRL6 GENRL5))
+                                       GENRL4)
+                                  (LENGTH (ADD (CONS GENRL6 GENRL5) GENRL4)))
+                           T)
+                     T)
+               T))).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP GENRL4)
+      (COND (NUMBERP GENRL3)
+            (EQUAL (LENGTH GENRL4)
+                   (LENGTH (LENGTH GENRL4)))
+            T)
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (LENGTH GENRL4) BY GENRL5.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL5)
+         (COND (NUMBERP GENRL4)
+               (COND (NUMBERP GENRL3)
+                     (EQUAL GENRL5 (LENGTH GENRL5))
+                     T)
+               T))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL5.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP NIL)
+              (COND (NUMBERP GENRL4)
+                    (COND (NUMBERP GENRL3)
+                          (EQUAL NIL (LENGTH NIL))
+                          T)
+                    T))
+     (IMPLIES (IMPLIES (NUMBERP GENRL5)
+                       (COND (NUMBERP GENRL4)
+                             (COND (NUMBERP GENRL3)
+                                   (EQUAL GENRL5 (LENGTH GENRL5))
+                                   T)
+                             T))
+              (IMPLIES (NUMBERP (CONS GENRL6 GENRL5))
+                       (COND (NUMBERP GENRL4)
+                             (COND (NUMBERP GENRL3)
+                                   (EQUAL (CONS GENRL6 GENRL5)
+                                          (LENGTH (CONS GENRL6 GENRL5)))
+                                   T)
+                             T)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-34 (EVEN2 (DOUBLE A)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EVEN2 (DOUBLE NIL))
+     (IMPLIES (EVEN2 (DOUBLE A))
+              (EVEN2 (DOUBLE (CONS A1 A))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EVEN2 (DOUBLE A))
+      (EVEN2 (LENGTH (DOUBLE A)))
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (DOUBLE A) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL1) (COND (EVEN2 GENRL1) (EVEN2 (LENGTH GENRL1)) T))
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+ (IMPLIES (NUMBERP NIL)
+          (COND (EVEN2 NIL)
+                (EVEN2 (LENGTH NIL))
+                T))
+ (AND
+  (IMPLIES (NUMBERP (CONS GENRL2 NIL))
+           (COND (EVEN2 (CONS GENRL2 NIL))
+                 (EVEN2 (LENGTH (CONS GENRL2 NIL)))
+                 T))
+  (IMPLIES (IMPLIES (NUMBERP GENRL1)
+                    (COND (EVEN2 GENRL1)
+                          (EVEN2 (LENGTH GENRL1))
+                          T))
+           (IMPLIES (NUMBERP (CONS GENRL2 (CONS GENRL3 GENRL1)))
+                    (COND (EVEN2 (CONS GENRL2 (CONS GENRL3 GENRL1)))
+                          (EVEN2 (LENGTH (CONS GENRL2 (CONS GENRL3 GENRL1))))
+                          T))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-35
+               (IMPLIES (NUMBERP A)
+                        (EQUAL (HALF (DOUBLE A)) A)))
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP A)
+      (EQUAL (HALF (DOUBLE A)) A)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (NUMBERP NIL)
+           (EQUAL (HALF (DOUBLE NIL)) NIL)
+           T)
+     (IMPLIES (COND (NUMBERP A)
+                    (EQUAL (HALF (DOUBLE A)) A)
+                    T)
+              (COND (NUMBERP (CONS A1 A))
+                    (EQUAL (HALF (DOUBLE (CONS A1 A)))
+                           (CONS A1 A))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP A)
+      (COND (EQUAL (HALF (DOUBLE A)) A)
+            (COND A1
+                  T (EQUAL (HALF (LENGTH (DOUBLE A))) A))
+            T)
+      T).
+
+FERTILIZE WITH (EQUAL (HALF (DOUBLE A)) A).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (NUMBERP A)
+      (COND A1 T
+            (EQUAL (HALF (LENGTH (DOUBLE A)))
+                   (HALF (DOUBLE A))))
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (DOUBLE A) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL1)
+         (COND (NUMBERP A)
+               (COND A1 T
+                     (EQUAL (HALF (LENGTH GENRL1))
+                            (HALF GENRL1)))
+               T))
+
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+ (IMPLIES (NUMBERP NIL)
+          (COND (NUMBERP A)
+                (COND A1 T
+                      (EQUAL (HALF (LENGTH NIL)) (HALF NIL)))
+                T))
+ (AND
+  (IMPLIES (NUMBERP (CONS GENRL2 NIL))
+           (COND (NUMBERP A)
+                 (COND A1 T
+                       (EQUAL (HALF (LENGTH (CONS GENRL2 NIL)))
+                              (HALF (CONS GENRL2 NIL))))
+                 T))
+  (IMPLIES
+   (IMPLIES (NUMBERP GENRL1)
+            (COND (NUMBERP A)
+                  (COND A1 T
+                        (EQUAL (HALF (LENGTH GENRL1))
+                               (HALF GENRL1)))
+                  T))
+   (IMPLIES
+        (NUMBERP (CONS GENRL2 (CONS GENRL3 GENRL1)))
+        (COND (NUMBERP A)
+              (COND A1 T
+                    (EQUAL (HALF (LENGTH (CONS GENRL2 (CONS GENRL3 GENRL1))))
+                           (HALF (CONS GENRL2 (CONS GENRL3 GENRL1)))))
+              T))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-36
+               (IMPLIES (AND (NUMBERP A) (EVEN2 A))
+                        (EQUAL (DOUBLE (HALF A)) A)))
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP A)
+      (COND (EVEN2 A)
+            (EQUAL (DOUBLE (HALF A)) A)
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (NUMBERP NIL)
+           (COND (EVEN2 NIL)
+                 (EQUAL (DOUBLE (HALF NIL)) NIL)
+                 T)
+           T)
+     (AND (COND (NUMBERP (CONS A1 NIL))
+                (COND (EVEN2 (CONS A1 NIL))
+                      (EQUAL (DOUBLE (HALF (CONS A1 NIL)))
+                             (CONS A1 NIL))
+                      T)
+                T)
+          (IMPLIES (COND (NUMBERP A)
+                         (COND (EVEN2 A)
+                               (EQUAL (DOUBLE (HALF A)) A)
+                               T)
+                         T)
+                   (COND (NUMBERP (CONS A1 (CONS A2 A)))
+                         (COND (EVEN2 (CONS A1 (CONS A2 A)))
+                               (EQUAL (DOUBLE (HALF (CONS A1 (CONS A2 A))))
+                                      (CONS A1 (CONS A2 A)))
+                               T)
+                         T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP A)
+      (COND (EVEN2 A)
+            (COND (EQUAL (DOUBLE (HALF A)) A)
+                  (COND A1 T
+                        (COND A2
+                              T (EQUAL (LENGTH (DOUBLE (HALF A))) A)))
+                  T)
+            T)
+      T).
+
+FERTILIZE WITH (EQUAL (DOUBLE (HALF A)) A).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (NUMBERP A)
+      (COND (EVEN2 A)
+            (COND A1 T (COND A2 T (EQUAL (LENGTH A) A)))
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+  (COND (NUMBERP NIL)
+        (COND (EVEN2 NIL)
+              (COND A1
+                    T (COND A2 T (EQUAL (LENGTH NIL) NIL)))
+              T)
+        T)
+  (AND (COND (NUMBERP (CONS A3 NIL))
+             (COND (EVEN2 (CONS A3 NIL))
+                   (COND A1 T
+                         (COND A2 T
+                               (EQUAL (LENGTH (CONS A3 NIL))
+                                      (CONS A3 NIL))))
+                   T)
+             T)
+       (IMPLIES (COND (NUMBERP A)
+                      (COND (EVEN2 A)
+                            (COND A1 T (COND A2 T (EQUAL (LENGTH A) A)))
+                            T)
+                      T)
+                (COND (NUMBERP (CONS A3 (CONS A4 A)))
+                      (COND (EVEN2 (CONS A3 (CONS A4 A)))
+                            (COND A1 T
+                                  (COND A2 T
+                                        (EQUAL (LENGTH (CONS A3 (CONS A4 A)))
+                                               (CONS A3 (CONS A4 A)))))
+                            T)
+                      T)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-37 (EQUAL (DOUBLE A) (MULT 2 A)))
+WHICH IS EQUIVALENT TO:
+(EQUAL (DOUBLE A) (ADD A (ADD A NIL))).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (DOUBLE NIL)
+            (ADD NIL (ADD NIL NIL)))
+     (IMPLIES (EQUAL (DOUBLE A) (ADD A (ADD A NIL)))
+              (EQUAL (DOUBLE (CONS A1 A))
+                     (ADD (CONS A1 A)
+                          (ADD (CONS A1 A) NIL))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (DOUBLE A) (ADD A (ADD A NIL)))
+      (EQUAL (CONS NIL (LENGTH (DOUBLE A)))
+             (ADD A (CONS NIL (ADD A NIL))))
+      T).
+
+FERTILIZE WITH (EQUAL (DOUBLE A) (ADD A (ADD A NIL))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (CONS NIL (LENGTH (ADD A (ADD A NIL))))
+       (ADD A (CONS NIL (ADD A NIL)))).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (ADD A NIL) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL1)
+         (EQUAL (CONS NIL (LENGTH (ADD A GENRL1)))
+                (ADD A (CONS NIL GENRL1))))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP GENRL1)
+              (EQUAL (CONS NIL (LENGTH (ADD NIL GENRL1)))
+                     (ADD NIL (CONS NIL GENRL1))))
+     (IMPLIES (IMPLIES (NUMBERP GENRL1)
+                       (EQUAL (CONS NIL (LENGTH (ADD A GENRL1)))
+                              (ADD A (CONS NIL GENRL1))))
+              (IMPLIES (NUMBERP GENRL1)
+                       (EQUAL (CONS NIL (LENGTH (ADD (CONS A1 A) GENRL1)))
+                              (ADD (CONS A1 A) (CONS NIL GENRL1)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP GENRL1)
+      (EQUAL (LENGTH (LENGTH GENRL1))
+             (LENGTH GENRL1))
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (LENGTH GENRL1) BY GENRL2.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL2)
+         (COND (NUMBERP GENRL1)
+               (EQUAL (LENGTH GENRL2) GENRL2)
+               T))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP NIL)
+              (COND (NUMBERP GENRL1)
+                    (EQUAL (LENGTH NIL) NIL)
+                    T))
+     (IMPLIES (IMPLIES (NUMBERP GENRL2)
+                       (COND (NUMBERP GENRL1)
+                             (EQUAL (LENGTH GENRL2) GENRL2)
+                             T))
+              (IMPLIES (NUMBERP (CONS GENRL3 GENRL2))
+                       (COND (NUMBERP GENRL1)
+                             (EQUAL (LENGTH (CONS GENRL3 GENRL2))
+                                    (CONS GENRL3 GENRL2))
+                             T)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-38 (EQUAL (DOUBLE A) (MULT A 2)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (DOUBLE NIL) (MULT NIL 2))
+     (IMPLIES (EQUAL (DOUBLE A) (MULT A 2))
+              (EQUAL (DOUBLE (CONS A1 A))
+                     (MULT (CONS A1 A) 2)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (DOUBLE A) (MULT A 2))
+      (EQUAL (LENGTH (DOUBLE A))
+             (LENGTH (MULT A 2)))
+      T).
+
+FERTILIZE WITH (EQUAL (DOUBLE A) (MULT A (CONS NIL (CONS NIL NIL)))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (LENGTH (DOUBLE A))
+       (LENGTH (DOUBLE A))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-39 (EQUAL (EVEN1 T A) (EVEN2 A)))
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (EVEN1 T NIL) (EVEN2 NIL))
+     (AND (EQUAL (EVEN1 T (CONS A1 NIL))
+                 (EVEN2 (CONS A1 NIL)))
+          (IMPLIES (EQUAL (EVEN1 T A) (EVEN2 A))
+                   (EQUAL (EVEN1 T (CONS A1 (CONS A2 A)))
+                          (EVEN2 (CONS A1 (CONS A2 A))))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-40
+               (GT (LENGTH (CONS A B)) (LENGTH B)))
+WHICH IS EQUIVALENT TO:
+(GT (CONS NIL (LENGTH B)) (LENGTH B)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (GT (CONS NIL (LENGTH NIL))
+         (LENGTH NIL))
+     (IMPLIES (GT (CONS NIL (LENGTH B)) (LENGTH B))
+              (GT (CONS NIL (LENGTH (CONS B1 B)))
+                  (LENGTH (CONS B1 B))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-41
+               (IMPLIES (AND (GT A B) (GT B C))
+                        (GT A C)))
+WHICH IS EQUIVALENT TO:
+(COND (GT A B)
+      (COND (GT B C) (GT A C) T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B, C AND A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (GT A NIL)
+                (COND (GT NIL C) (GT A C) T)
+                T)
+          (AND (COND (GT A B)
+                     (COND (GT B NIL) (GT A NIL) T)
+                     T)
+               (COND (GT NIL B)
+                     (COND (GT B C) (GT NIL C) T)
+                     T)))
+     (IMPLIES (COND (GT A B)
+                    (COND (GT B C) (GT A C) T)
+                    T)
+              (COND (GT (CONS A1 A) (CONS B1 B))
+                    (COND (GT (CONS B1 B) (CONS C1 C))
+                          (GT (CONS A1 A) (CONS C1 C))
+                          T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND (GT A B)
+      (COND B (COND A T NIL) T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B AND A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (GT A NIL)
+                (COND NIL (COND A T NIL) T)
+                T)
+          (COND (GT NIL B)
+                (COND B (COND NIL T NIL) T)
+                T))
+     (IMPLIES (COND (GT A B)
+                    (COND B (COND A T NIL) T)
+                    T)
+              (COND (GT (CONS A1 A) (CONS B1 B))
+                    (COND (CONS B1 B)
+                          (COND (CONS A1 A) T NIL)
+                          T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-42
+               (IMPLIES (GT A B) (NOT (GT B A))))
+WHICH IS EQUIVALENT TO:
+(COND (GT A B) (COND (GT B A) NIL T) T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A AND B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (GT NIL B)
+                (COND (GT B NIL) NIL T)
+                T)
+          (COND (GT A NIL)
+                (COND (GT NIL A) NIL T)
+                T))
+     (IMPLIES (COND (GT A B) (COND (GT B A) NIL T) T)
+              (COND (GT (CONS A1 A) (CONS B1 B))
+                    (COND (GT (CONS B1 B) (CONS A1 A))
+                          NIL T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-43 (LTE A (APPEND B A)))
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (LTE A (APPEND NIL A))
+     (IMPLIES (LTE A (APPEND B A))
+              (LTE A (APPEND (CONS B1 B) A)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (LTE A A)
+      (COND (LTE A (APPEND B A))
+            (LTE A (CONS B1 (APPEND B A)))
+            T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (LTE NIL NIL)
+           (IMPLIES (LTE A A)
+                    (LTE (CONS A1 A) (CONS A1 A))))
+      (COND (LTE A2 (APPEND B A2))
+            (LTE A2 (CONS B1 (APPEND B A2)))
+            T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (LTE A2 (APPEND B A2))
+      (LTE A2 (CONS B1 (APPEND B A2)))
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (APPEND B A2) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(COND (LTE A2 GENRL1) (LTE A2 (CONS B1 GENRL1)) T)
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1 AND A2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (LTE A2 NIL)
+                (LTE A2 (CONS B1 NIL))
+                T)
+          (COND (LTE NIL GENRL1)
+                (LTE NIL (CONS B1 GENRL1))
+                T))
+     (IMPLIES (COND (LTE A2 GENRL1)
+                    (LTE A2 (CONS B1 GENRL1))
+                    T)
+              (COND (LTE (CONS A3 A2) (CONS GENRL2 GENRL1))
+                    (LTE (CONS A3 A2)
+                         (CONS B1 (CONS GENRL2 GENRL1)))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND (LTE A2 GENRL1)
+      (COND (LTE A2 (CONS B1 GENRL1))
+            (LTE A2 (CONS GENRL2 GENRL1))
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1 AND A2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (LTE A2 NIL)
+                (COND (LTE A2 (CONS B1 NIL))
+                      (LTE A2 (CONS GENRL2 NIL))
+                      T)
+                T)
+          (COND (LTE NIL GENRL1)
+                (COND (LTE NIL (CONS B1 GENRL1))
+                      (LTE NIL (CONS GENRL2 GENRL1))
+                      T)
+                T))
+     (IMPLIES (COND (LTE A2 GENRL1)
+                    (COND (LTE A2 (CONS B1 GENRL1))
+                          (LTE A2 (CONS GENRL2 GENRL1))
+                          T)
+                    T)
+              (COND (LTE (CONS A3 A2) (CONS GENRL3 GENRL1))
+                    (COND (LTE (CONS A3 A2)
+                               (CONS B1 (CONS GENRL3 GENRL1)))
+                          (LTE (CONS A3 A2)
+                               (CONS GENRL2 (CONS GENRL3 GENRL1)))
+                          T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-44 (OR (LTE A B) (LTE B A)))
+WHICH IS EQUIVALENT TO:
+(COND (LTE A B) T (LTE B A)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A AND B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (LTE NIL B) T (LTE B NIL))
+          (COND (LTE A NIL) T (LTE NIL A)))
+     (IMPLIES (COND (LTE A B) T (LTE B A))
+              (COND (LTE (CONS A1 A) (CONS B1 B))
+                    T (LTE (CONS B1 B) (CONS A1 A))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-45
+               (OR (GT A B)
+                   (OR (GT B A)
+                       (EQUAL (LENGTH A) (LENGTH B)))))
+WHICH IS EQUIVALENT TO:
+(COND (GT A B)
+      T
+      (COND (GT B A)
+            T (EQUAL (LENGTH A) (LENGTH B)))).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A AND B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (GT NIL B)
+                T
+                (COND (GT B NIL)
+                      T (EQUAL (LENGTH NIL) (LENGTH B))))
+          (COND (GT A NIL)
+                T
+                (COND (GT NIL A)
+                      T (EQUAL (LENGTH A) (LENGTH NIL)))))
+     (IMPLIES (COND (GT A B)
+                    T
+                    (COND (GT B A)
+                          T (EQUAL (LENGTH A) (LENGTH B))))
+              (COND (GT (CONS A1 A) (CONS B1 B))
+                    T
+                    (COND (GT (CONS B1 B) (CONS A1 A))
+                          T
+                          (EQUAL (LENGTH (CONS A1 A))
+                                 (LENGTH (CONS B1 B))))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (LENGTH B) (COND B T NIL) T)
+      (COND (LENGTH A) (COND A T NIL) T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (COND (LENGTH NIL) (COND NIL T NIL) T)
+           (IMPLIES (COND (LENGTH B) (COND B T NIL) T)
+                    (COND (LENGTH (CONS B1 B))
+                          (COND (CONS B1 B) T NIL)
+                          T)))
+      (COND (LENGTH A) (COND A T NIL) T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (LENGTH A) (COND A T NIL) T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (LENGTH NIL) (COND NIL T NIL) T)
+     (IMPLIES (COND (LENGTH A) (COND A T NIL) T)
+              (COND (LENGTH (CONS A1 A))
+                    (COND (CONS A1 A) T NIL)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-46 (EQUAL (MONOT2P A) (MONOT1 A)))
+WHICH IS EQUIVALENT TO:
+(COND A
+      (EQUAL (MONOT2 (CAR A) (CDR A))
+             (MONOT1 A))
+      T).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND NIL
+           (EQUAL (MONOT2 (CAR NIL) (CDR NIL))
+                  (MONOT1 NIL))
+           T)
+     (AND (COND (CONS A1 NIL)
+                (EQUAL (MONOT2 (CAR (CONS A1 NIL))
+                               (CDR (CONS A1 NIL)))
+                       (MONOT1 (CONS A1 NIL)))
+                T)
+          (IMPLIES (COND (CONS A2 A)
+                         (EQUAL (MONOT2 (CAR (CONS A2 A))
+                                        (CDR (CONS A2 A)))
+                                (MONOT1 (CONS A2 A)))
+                         T)
+                   (COND (CONS A1 (CONS A2 A))
+                         (EQUAL (MONOT2 (CAR (CONS A1 (CONS A2 A)))
+                                        (CDR (CONS A1 (CONS A2 A))))
+                                (MONOT1 (CONS A1 (CONS A2 A))))
+                         T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND A
+      (COND (EQUAL A2 (CAR A))
+            (COND (EQUAL (MONOT2 A2 A) (MONOT1 A))
+                  (COND (EQUAL A1 A2)
+                        (EQUAL (MONOT2 A1 A) (MONOT1 A))
+                        T)
+                  T)
+            (COND (MONOT2 A2 A)
+                  T
+                  (COND (EQUAL A1 A2)
+                        (COND (MONOT2 A1 A) NIL T)
+                        T)))
+      T).
+
+FERTILIZE WITH (EQUAL A2 (CAR A)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A
+      (COND (COND (EQUAL (MONOT2 (CAR A) A) (MONOT1 A))
+                  (COND (EQUAL A1 (CAR A))
+                        (EQUAL (MONOT2 A1 A) (MONOT1 A))
+                        T)
+                  T)
+            (COND (COND (MONOT2 A2 A)
+                        T
+                        (COND (EQUAL A1 A2)
+                              (COND (MONOT2 A1 A) NIL T)
+                              T))
+                  T (EQUAL A2 (CAR A)))
+            NIL)
+      T).
+
+WHICH IS EQUIVALENT TO:
+(COND A
+      (COND (COND (EQUAL (MONOT2 (CAR A) A) (MONOT1 A))
+                  (COND (EQUAL A1 (CAR A))
+                        (EQUAL (MONOT2 A1 A) (MONOT1 A))
+                        T)
+                  T)
+            (COND (MONOT2 A2 A)
+                  T
+                  (COND (EQUAL A1 A2)
+                        (COND (MONOT2 A1 A)
+                              (EQUAL A2 (CAR A))
+                              T)
+                        T))
+            NIL)
+      T).
+
+FERTILIZE WITH (EQUAL (MONOT2 (CAR A) A) (MONOT1 A)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A
+      (COND (COND (EQUAL A1 (CAR A))
+                  (EQUAL (MONOT2 A1 A) (MONOT2 (CAR A) A))
+                  T)
+            (COND (MONOT2 A2 A)
+                  T
+                  (COND (EQUAL A1 A2)
+                        (COND (MONOT2 A1 A)
+                              (EQUAL A2 (CAR A))
+                              T)
+                        T))
+            NIL)
+      T).
+
+FERTILIZE WITH (EQUAL A1 (CAR A)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A
+      (COND (EQUAL (MONOT2 A1 A) (MONOT2 A1 A))
+            (COND (MONOT2 A2 A)
+                  T
+                  (COND (EQUAL A1 A2)
+                        (COND (MONOT2 A1 A)
+                              (EQUAL A2 (CAR A))
+                              T)
+                        T))
+            NIL)
+      T).
+
+WHICH IS EQUIVALENT TO:
+(COND A
+      (COND (MONOT2 A2 A)
+            T
+            (COND (EQUAL A1 A2)
+                  (COND (MONOT2 A1 A)
+                        (EQUAL A2 (CAR A))
+                        T)
+                  T))
+      T).
+
+FERTILIZE WITH (EQUAL A1 A2).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A
+      (COND (MONOT2 A2 A)
+            T
+            (COND (MONOT2 A1 A)
+                  (EQUAL A1 (CAR A))
+                  T))
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND NIL
+           (COND (MONOT2 A2 NIL)
+                 T
+                 (COND (MONOT2 A1 NIL)
+                       (EQUAL A1 (CAR NIL))
+                       T))
+           T)
+     (IMPLIES (COND A
+                    (COND (MONOT2 A2 A)
+                          T
+                          (COND (MONOT2 A1 A)
+                                (EQUAL A1 (CAR A))
+                                T))
+                    T)
+              (COND (CONS A3 A)
+                    (COND (MONOT2 A2 (CONS A3 A))
+                          T
+                          (COND (MONOT2 A1 (CONS A3 A))
+                                (EQUAL A1 (CAR (CONS A3 A)))
+                                T))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-47 (ORDERED (SORT A)))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (ORDERED (SORT NIL))
+     (IMPLIES (ORDERED (SORT A))
+              (ORDERED (SORT (CONS A1 A))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (ORDERED (SORT A))
+      (ORDERED (ADDTOLIST A1 (SORT A)))
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (SORT A) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(COND (ORDERED GENRL1) (ORDERED (ADDTOLIST A1 GENRL1)) T)
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+ (COND (ORDERED NIL)
+       (ORDERED (ADDTOLIST A1 NIL))
+       T)
+ (AND
+   (COND (ORDERED (CONS GENRL2 NIL))
+         (ORDERED (ADDTOLIST A1 (CONS GENRL2 NIL)))
+         T)
+   (IMPLIES (COND (ORDERED (CONS GENRL3 GENRL1))
+                  (ORDERED (ADDTOLIST A1 (CONS GENRL3 GENRL1)))
+                  T)
+            (COND (ORDERED (CONS GENRL2 (CONS GENRL3 GENRL1)))
+                  (ORDERED (ADDTOLIST A1 (CONS GENRL2 (CONS GENRL3 GENRL1))))
+                  T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (LTE A1 GENRL2)
+      T (LTE GENRL2 A1)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A1 AND GENRL2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (LTE NIL GENRL2)
+                T (LTE GENRL2 NIL))
+          (COND (LTE A1 NIL) T (LTE NIL A1)))
+     (IMPLIES (COND (LTE A1 GENRL2) T (LTE GENRL2 A1))
+              (COND (LTE (CONS A2 A1) (CONS GENRL3 GENRL2))
+                    T
+                    (LTE (CONS GENRL3 GENRL2)
+                         (CONS A2 A1))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-48
+               (IMPLIES (AND (MONOT1 A) (MEMBER B A))
+                        (EQUAL (CAR A) B)))
+WHICH IS EQUIVALENT TO:
+(COND (MONOT1 A)
+      (COND (MEMBER B A) (EQUAL (CAR A) B) T)
+      T).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (MONOT1 NIL)
+           (COND (MEMBER B NIL)
+                 (EQUAL (CAR NIL) B)
+                 T)
+           T)
+     (AND (COND (MONOT1 (CONS A1 NIL))
+                (COND (MEMBER B (CONS A1 NIL))
+                      (EQUAL (CAR (CONS A1 NIL)) B)
+                      T)
+                T)
+          (IMPLIES (COND (MONOT1 (CONS A2 A))
+                         (COND (MEMBER B (CONS A2 A))
+                               (EQUAL (CAR (CONS A2 A)) B)
+                               T)
+                         T)
+                   (COND (MONOT1 (CONS A1 (CONS A2 A)))
+                         (COND (MEMBER B (CONS A1 (CONS A2 A)))
+                               (EQUAL (CAR (CONS A1 (CONS A2 A))) B)
+                               T)
+                         T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (EQUAL B A1) (EQUAL A1 B) T)
+      (COND A
+            (COND (EQUAL A2 (CAR A))
+                  (COND (MONOT1 A)
+                        (COND (EQUAL B A2)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))
+                        T)
+                  T)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  T))
+      NIL).
+
+FERTILIZE WITH (EQUAL B A1).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL B B)
+      (COND A
+            (COND (EQUAL A2 (CAR A))
+                  (COND (MONOT1 A)
+                        (COND (EQUAL B A2)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))
+                        T)
+                  T)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  T))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND A
+      (COND (EQUAL A2 (CAR A))
+            (COND (MONOT1 A)
+                  (COND (EQUAL B A2)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (MEMBER B A)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              T))
+                  T)
+            T)
+      (COND (EQUAL B A2)
+            (COND (EQUAL A2 B)
+                  (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                  T)
+            T)).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+ (COND NIL
+       (COND (EQUAL A2 (CAR NIL))
+             (COND (MONOT1 NIL)
+                   (COND (EQUAL B A2)
+                         (COND (EQUAL A2 B)
+                               (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                               T)
+                         (COND (MEMBER B NIL)
+                               (COND (EQUAL A2 B)
+                                     (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                     T)
+                               T))
+                   T)
+             T)
+       (COND (EQUAL B A2)
+             (COND (EQUAL A2 B)
+                   (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                   T)
+             T))
+ (AND
+  (COND (CONS A3 NIL)
+        (COND (EQUAL A2 (CAR (CONS A3 NIL)))
+              (COND (MONOT1 (CONS A3 NIL))
+                    (COND (EQUAL B A2)
+                          (COND (EQUAL A2 B)
+                                (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                T)
+                          (COND (MEMBER B (CONS A3 NIL))
+                                (COND (EQUAL A2 B)
+                                      (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                      T)
+                                T))
+                    T)
+              T)
+        (COND (EQUAL B A2)
+              (COND (EQUAL A2 B)
+                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                    T)
+              T))
+  (IMPLIES
+      (COND (CONS A4 A)
+            (COND (EQUAL A2 (CAR (CONS A4 A)))
+                  (COND (MONOT1 (CONS A4 A))
+                        (COND (EQUAL B A2)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B (CONS A4 A))
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))
+                        T)
+                  T)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  T))
+      (COND (CONS A3 (CONS A4 A))
+            (COND (EQUAL A2 (CAR (CONS A3 (CONS A4 A))))
+                  (COND (MONOT1 (CONS A3 (CONS A4 A)))
+                        (COND (EQUAL B A2)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B (CONS A3 (CONS A4 A)))
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))
+                        T)
+                  T)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  T))))).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (COND (EQUAL B A2)
+       (COND (EQUAL A2 B)
+             (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+             T)
+       T)
+ (COND
+  (COND (EQUAL A2 A3)
+        (COND (EQUAL B A2)
+              (COND (EQUAL A2 B)
+                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                    T)
+              (COND (EQUAL B A3)
+                    (COND (EQUAL A2 B)
+                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                          T)
+                    T))
+        T)
+  (COND
+   (EQUAL A2 A4)
+   (COND
+    A
+    (COND
+     (EQUAL A4 (CAR A))
+     (COND
+      (MONOT1 A)
+      (COND
+       (EQUAL B A2)
+       T
+       (COND
+            (EQUAL B A4)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A4)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T))))
+      T)
+     T)
+    (COND (EQUAL B A2)
+          T
+          (COND (EQUAL B A4)
+                T
+                (COND (EQUAL A2 A3)
+                      (COND (EQUAL A3 A4)
+                            (COND (EQUAL B A3)
+                                  (COND (EQUAL A2 B)
+                                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                        T)
+                                  T)
+                            T)
+                      T))))
+   (COND
+    (EQUAL A2 A3)
+    (COND
+     (EQUAL A3 A4)
+     (COND
+      A
+      (COND
+       (EQUAL A4 (CAR A))
+       (COND
+            (MONOT1 A)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A3)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (EQUAL B A4)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))))
+            T)
+       T)
+      (COND (EQUAL B A2)
+            (COND (EQUAL A2 B)
+                  (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                  T)
+            (COND (EQUAL B A3)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A4)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        T))))
+     T)
+    T))
+  NIL)
+ NIL).
+
+FERTILIZE WITH (EQUAL B A2).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (COND (EQUAL B B)
+       (COND (EQUAL A1 B) (EQUAL A1 B) T)
+       T)
+ (COND
+  (COND (EQUAL A2 A3)
+        (COND (EQUAL B A2)
+              (COND (EQUAL A2 B)
+                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                    T)
+              (COND (EQUAL B A3)
+                    (COND (EQUAL A2 B)
+                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                          T)
+                    T))
+        T)
+  (COND
+   (EQUAL A2 A4)
+   (COND
+    A
+    (COND
+     (EQUAL A4 (CAR A))
+     (COND
+      (MONOT1 A)
+      (COND
+       (EQUAL B A2)
+       T
+       (COND
+            (EQUAL B A4)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A4)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T))))
+      T)
+     T)
+    (COND (EQUAL B A2)
+          T
+          (COND (EQUAL B A4)
+                T
+                (COND (EQUAL A2 A3)
+                      (COND (EQUAL A3 A4)
+                            (COND (EQUAL B A3)
+                                  (COND (EQUAL A2 B)
+                                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                        T)
+                                  T)
+                            T)
+                      T))))
+   (COND
+    (EQUAL A2 A3)
+    (COND
+     (EQUAL A3 A4)
+     (COND
+      A
+      (COND
+       (EQUAL A4 (CAR A))
+       (COND
+            (MONOT1 A)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A3)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (EQUAL B A4)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))))
+            T)
+       T)
+      (COND (EQUAL B A2)
+            (COND (EQUAL A2 B)
+                  (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                  T)
+            (COND (EQUAL B A3)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A4)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        T))))
+     T)
+    T))
+  NIL)
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (COND (EQUAL A2 A3)
+       (COND (EQUAL B A2)
+             (COND (EQUAL A2 B)
+                   (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                   T)
+             (COND (EQUAL B A3)
+                   (COND (EQUAL A2 B)
+                         (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                         T)
+                   T))
+       T)
+ (COND
+  (EQUAL A2 A4)
+  (COND
+   A
+   (COND
+    (EQUAL A4 (CAR A))
+    (COND
+     (MONOT1 A)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A4)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T))))
+     T)
+    T)
+   (COND (EQUAL B A2)
+         T
+         (COND (EQUAL B A4)
+               T
+               (COND (EQUAL A2 A3)
+                     (COND (EQUAL A3 A4)
+                           (COND (EQUAL B A3)
+                                 (COND (EQUAL A2 B)
+                                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                       T)
+                                 T)
+                           T)
+                     T))))
+  (COND
+   (EQUAL A2 A3)
+   (COND
+    (EQUAL A3 A4)
+    (COND
+     A
+     (COND
+      (EQUAL A4 (CAR A))
+      (COND (MONOT1 A)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A3)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (EQUAL B A4)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))))
+            T)
+      T)
+     (COND (EQUAL B A2)
+           (COND (EQUAL A2 B)
+                 (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                 T)
+           (COND (EQUAL B A3)
+                 (COND (EQUAL A2 B)
+                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                       T)
+                 (COND (EQUAL B A4)
+                       (COND (EQUAL A2 B)
+                             (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                             T)
+                       T))))
+    T)
+   T))
+ NIL).
+
+FERTILIZE WITH (EQUAL A2 A3).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (COND (EQUAL B A2)
+       (COND (EQUAL A2 B)
+             (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+             T)
+       (COND (EQUAL B A2)
+             (COND (EQUAL A2 B)
+                   (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                   T)
+             T))
+ (COND
+  (EQUAL A2 A4)
+  (COND
+   A
+   (COND
+    (EQUAL A4 (CAR A))
+    (COND
+     (MONOT1 A)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A4)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T))))
+     T)
+    T)
+   (COND (EQUAL B A2)
+         T
+         (COND (EQUAL B A4)
+               T
+               (COND (EQUAL A2 A3)
+                     (COND (EQUAL A3 A4)
+                           (COND (EQUAL B A3)
+                                 (COND (EQUAL A2 B)
+                                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                       T)
+                                 T)
+                           T)
+                     T))))
+  (COND
+   (EQUAL A2 A3)
+   (COND
+    (EQUAL A3 A4)
+    (COND
+     A
+     (COND
+      (EQUAL A4 (CAR A))
+      (COND (MONOT1 A)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A3)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (EQUAL B A4)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))))
+            T)
+      T)
+     (COND (EQUAL B A2)
+           (COND (EQUAL A2 B)
+                 (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                 T)
+           (COND (EQUAL B A3)
+                 (COND (EQUAL A2 B)
+                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                       T)
+                 (COND (EQUAL B A4)
+                       (COND (EQUAL A2 B)
+                             (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                             T)
+                       T))))
+    T)
+   T))
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (COND (EQUAL B A2)
+       (COND (EQUAL A2 B)
+             (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+             T)
+       T)
+ (COND
+  (EQUAL A2 A4)
+  (COND
+   A
+   (COND
+    (EQUAL A4 (CAR A))
+    (COND
+     (MONOT1 A)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A4)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T))))
+     T)
+    T)
+   (COND (EQUAL B A2)
+         T
+         (COND (EQUAL B A4)
+               T
+               (COND (EQUAL A2 A3)
+                     (COND (EQUAL A3 A4)
+                           (COND (EQUAL B A3)
+                                 (COND (EQUAL A2 B)
+                                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                       T)
+                                 T)
+                           T)
+                     T))))
+  (COND
+   (EQUAL A2 A3)
+   (COND
+    (EQUAL A3 A4)
+    (COND
+     A
+     (COND
+      (EQUAL A4 (CAR A))
+      (COND (MONOT1 A)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A3)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (EQUAL B A4)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))))
+            T)
+      T)
+     (COND (EQUAL B A2)
+           (COND (EQUAL A2 B)
+                 (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                 T)
+           (COND (EQUAL B A3)
+                 (COND (EQUAL A2 B)
+                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                       T)
+                 (COND (EQUAL B A4)
+                       (COND (EQUAL A2 B)
+                             (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                             T)
+                       T))))
+    T)
+   T))
+ NIL).
+
+FERTILIZE WITH (EQUAL B A2).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (COND (EQUAL B B)
+       (COND (EQUAL A1 B) (EQUAL A1 B) T)
+       T)
+ (COND
+  (EQUAL A2 A4)
+  (COND
+   A
+   (COND
+    (EQUAL A4 (CAR A))
+    (COND
+     (MONOT1 A)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A4)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T))))
+     T)
+    T)
+   (COND (EQUAL B A2)
+         T
+         (COND (EQUAL B A4)
+               T
+               (COND (EQUAL A2 A3)
+                     (COND (EQUAL A3 A4)
+                           (COND (EQUAL B A3)
+                                 (COND (EQUAL A2 B)
+                                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                       T)
+                                 T)
+                           T)
+                     T))))
+  (COND
+   (EQUAL A2 A3)
+   (COND
+    (EQUAL A3 A4)
+    (COND
+     A
+     (COND
+      (EQUAL A4 (CAR A))
+      (COND (MONOT1 A)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A3)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (EQUAL B A4)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))))
+            T)
+      T)
+     (COND (EQUAL B A2)
+           (COND (EQUAL A2 B)
+                 (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                 T)
+           (COND (EQUAL B A3)
+                 (COND (EQUAL A2 B)
+                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                       T)
+                 (COND (EQUAL B A4)
+                       (COND (EQUAL A2 B)
+                             (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                             T)
+                       T))))
+    T)
+   T))
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (EQUAL A2 A4)
+ (COND
+  A
+  (COND
+   (EQUAL A4 (CAR A))
+   (COND
+    (MONOT1 A)
+    (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A4)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T))))
+    T)
+   T)
+  (COND (EQUAL B A2)
+        T
+        (COND (EQUAL B A4)
+              T
+              (COND (EQUAL A2 A3)
+                    (COND (EQUAL A3 A4)
+                          (COND (EQUAL B A3)
+                                (COND (EQUAL A2 B)
+                                      (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                      T)
+                                T)
+                          T)
+                    T))))
+ (COND
+  (EQUAL A2 A3)
+  (COND
+   (EQUAL A3 A4)
+   (COND
+    A
+    (COND
+      (EQUAL A4 (CAR A))
+      (COND (MONOT1 A)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A3)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (EQUAL B A4)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))))
+            T)
+      T)
+    (COND (EQUAL B A2)
+          (COND (EQUAL A2 B)
+                (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                T)
+          (COND (EQUAL B A3)
+                (COND (EQUAL A2 B)
+                      (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                      T)
+                (COND (EQUAL B A4)
+                      (COND (EQUAL A2 B)
+                            (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                            T)
+                      T))))
+   T)
+  T)).
+
+FERTILIZE WITH (EQUAL A2 A4).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (COND
+  A
+  (COND
+   (EQUAL A2 (CAR A))
+   (COND
+    (MONOT1 A)
+    (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A2)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T))))
+    T)
+   T)
+  (COND (EQUAL B A2)
+        T
+        (COND (EQUAL B A2)
+              T
+              (COND (EQUAL A2 A3)
+                    (COND (EQUAL A3 A2)
+                          (COND (EQUAL B A3)
+                                (COND (EQUAL A2 B)
+                                      (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                      T)
+                                T)
+                          T)
+                    T))))
+ (COND
+  (COND
+   (EQUAL A2 A3)
+   (COND
+    (EQUAL A3 A4)
+    (COND
+     A
+     (COND
+      (EQUAL A4 (CAR A))
+      (COND (MONOT1 A)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                        T)
+                  (COND (EQUAL B A3)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                              T)
+                        (COND (EQUAL B A4)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                    T)
+                              (COND (MEMBER B A)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T))))
+            T)
+      T)
+     (COND (EQUAL B A2)
+           (COND (EQUAL A2 B)
+                 (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                 T)
+           (COND (EQUAL B A3)
+                 (COND (EQUAL A2 B)
+                       (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                       T)
+                 (COND (EQUAL B A4)
+                       (COND (EQUAL A2 B)
+                             (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                             T)
+                       T))))
+    T)
+   T)
+  T (EQUAL A2 A4))
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (COND
+  A
+  (COND
+   (EQUAL A2 (CAR A))
+   (COND
+      (MONOT1 A)
+      (COND (EQUAL B A2)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+   T)
+  (COND (EQUAL B A2)
+        T
+        (COND (EQUAL A2 A3)
+              (COND (EQUAL A3 A2)
+                    (COND (EQUAL B A3)
+                          (COND (EQUAL A2 B)
+                                (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                T)
+                          T)
+                    T)
+              T)))
+ (COND
+  (EQUAL A2 A3)
+  (COND
+   (EQUAL A3 A4)
+   (COND
+    A
+    (COND
+     (EQUAL A4 (CAR A))
+     (COND
+      (MONOT1 A)
+      (COND (EQUAL B A2)
+            (COND (EQUAL A2 B)
+                  (COND (EQUAL A1 A2)
+                        (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                        T)
+                  T)
+            (COND (EQUAL B A3)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2)
+                              (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                              T)
+                        T)
+                  (COND (EQUAL B A4)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2)
+                                    (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                                    T)
+                              T)
+                        (COND (MEMBER B A)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2)
+                                          (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                                          T)
+                                    T)
+                              T))))
+      T)
+     T)
+    (COND (EQUAL B A2)
+          (COND (EQUAL A2 B)
+                (COND (EQUAL A1 A2)
+                      (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                      T)
+                T)
+          (COND (EQUAL B A3)
+                (COND (EQUAL A2 B)
+                      (COND (EQUAL A1 A2)
+                            (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                            T)
+                      T)
+                (COND (EQUAL B A4)
+                      (COND (EQUAL A2 B)
+                            (COND (EQUAL A1 A2)
+                                  (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                                  T)
+                            T)
+                      T))))
+   T)
+  T)
+ NIL).
+
+FERTILIZE WITH (EQUAL A2 A3).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (COND
+  A
+  (COND
+   (EQUAL A2 (CAR A))
+   (COND
+      (MONOT1 A)
+      (COND (EQUAL B A2)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+   T)
+  (COND (EQUAL B A2)
+        T
+        (COND (EQUAL A2 A3)
+              (COND (EQUAL A3 A2)
+                    (COND (EQUAL B A3)
+                          (COND (EQUAL A2 B)
+                                (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                T)
+                          T)
+                    T)
+              T)))
+ (COND
+  (EQUAL A2 A4)
+  (COND
+   A
+   (COND
+    (EQUAL A4 (CAR A))
+    (COND
+      (MONOT1 A)
+      (COND (EQUAL B A2)
+            (COND (EQUAL A2 B)
+                  (COND (EQUAL A1 A2)
+                        (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                        T)
+                  T)
+            (COND (EQUAL B A2)
+                  (COND (EQUAL A2 B)
+                        (COND (EQUAL A1 A2)
+                              (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                              T)
+                        T)
+                  (COND (EQUAL B A4)
+                        (COND (EQUAL A2 B)
+                              (COND (EQUAL A1 A2)
+                                    (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                                    T)
+                              T)
+                        (COND (MEMBER B A)
+                              (COND (EQUAL A2 B)
+                                    (COND (EQUAL A1 A2)
+                                          (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                                          T)
+                                    T)
+                              T))))
+      T)
+    T)
+   (COND (EQUAL B A2)
+         (COND (EQUAL A2 B)
+               (COND (EQUAL A1 A2)
+                     (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                     T)
+               T)
+         (COND (EQUAL B A2)
+               (COND (EQUAL A2 B)
+                     (COND (EQUAL A1 A2)
+                           (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                           T)
+                     T)
+               (COND (EQUAL B A4)
+                     (COND (EQUAL A2 B)
+                           (COND (EQUAL A1 A2)
+                                 (COND (EQUAL A1 B) T (EQUAL A2 A4))
+                                 T)
+                           T)
+                     T))))
+  T)
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ A
+ (COND
+  (EQUAL A2 (CAR A))
+  (COND
+      (MONOT1 A)
+      (COND (EQUAL B A2)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+  T)
+ (COND (EQUAL B A2)
+       T
+       (COND (EQUAL A2 A3)
+             (COND (EQUAL A3 A2)
+                   (COND (EQUAL B A3)
+                         (COND (EQUAL A2 B)
+                               (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                               T)
+                         T)
+                   T)
+             T))).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND
+ (COND
+  NIL
+  (COND
+   (EQUAL A2 (CAR NIL))
+   (COND
+      (MONOT1 NIL)
+      (COND (EQUAL B A2)
+            T
+            (COND (MEMBER B NIL)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+   T)
+  (COND (EQUAL B A2)
+        T
+        (COND (EQUAL A2 A3)
+              (COND (EQUAL A3 A2)
+                    (COND (EQUAL B A3)
+                          (COND (EQUAL A2 B)
+                                (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                T)
+                          T)
+                    T)
+              T)))
+ (AND
+  (COND
+   (CONS A4 NIL)
+   (COND
+    (EQUAL A2 (CAR (CONS A4 NIL)))
+    (COND
+      (MONOT1 (CONS A4 NIL))
+      (COND (EQUAL B A2)
+            T
+            (COND (MEMBER B (CONS A4 NIL))
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+    T)
+   (COND (EQUAL B A2)
+         T
+         (COND (EQUAL A2 A3)
+               (COND (EQUAL A3 A2)
+                     (COND (EQUAL B A3)
+                           (COND (EQUAL A2 B)
+                                 (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                 T)
+                           T)
+                     T)
+               T)))
+  (IMPLIES
+   (COND
+    (CONS A5 A)
+    (COND
+     (EQUAL A2 (CAR (CONS A5 A)))
+     (COND
+      (MONOT1 (CONS A5 A))
+      (COND (EQUAL B A2)
+            T
+            (COND (MEMBER B (CONS A5 A))
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+     T)
+    (COND (EQUAL B A2)
+          T
+          (COND (EQUAL A2 A3)
+                (COND (EQUAL A3 A2)
+                      (COND (EQUAL B A3)
+                            (COND (EQUAL A2 B)
+                                  (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                  T)
+                            T)
+                      T)
+                T)))
+   (COND
+    (CONS A4 (CONS A5 A))
+    (COND
+     (EQUAL A2 (CAR (CONS A4 (CONS A5 A))))
+     (COND
+      (MONOT1 (CONS A4 (CONS A5 A)))
+      (COND (EQUAL B A2)
+            T
+            (COND (MEMBER B (CONS A4 (CONS A5 A)))
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+     T)
+    (COND (EQUAL B A2)
+          T
+          (COND (EQUAL A2 A3)
+                (COND (EQUAL A3 A2)
+                      (COND (EQUAL B A3)
+                            (COND (EQUAL A2 B)
+                                  (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                  T)
+                            T)
+                      T)
+                T)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (COND (EQUAL B A2)
+       T
+       (COND (EQUAL A2 A3)
+             (COND (EQUAL A3 A2)
+                   (COND (EQUAL B A3)
+                         (COND (EQUAL A2 B)
+                               (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                               T)
+                         T)
+                   T)
+             T))
+ (COND
+  (COND
+      (EQUAL A2 A4)
+      (COND (EQUAL B A2)
+            T
+            (COND (EQUAL B A4)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+  (COND
+   (EQUAL A2 A5)
+   T
+   (COND
+    (EQUAL A2 A4)
+    (COND
+     (EQUAL A4 A5)
+     (COND
+      A
+      (COND
+       (EQUAL A5 (CAR A))
+       (COND
+        (MONOT1 A)
+        (COND
+         (EQUAL B A2)
+         T
+         (COND
+          (EQUAL B A4)
+          T
+          (COND
+            (EQUAL B A5)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+        T)
+       T)
+      (COND
+       (EQUAL B A2)
+       T
+       (COND
+            (EQUAL B A4)
+            T
+            (COND (EQUAL B A5)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+     T)
+    T))
+  NIL)
+ NIL).
+
+FERTILIZE WITH (EQUAL A2 A3).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (COND (EQUAL B A2)
+       T
+       (COND (EQUAL A2 A2)
+             (COND (EQUAL B A2)
+                   (COND (EQUAL A2 B)
+                         (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                         T)
+                   T)
+             T))
+ (COND
+  (COND
+      (EQUAL A2 A4)
+      (COND (EQUAL B A2)
+            T
+            (COND (EQUAL B A4)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+  (COND
+   (EQUAL A2 A5)
+   T
+   (COND
+    (EQUAL A2 A4)
+    (COND
+     (EQUAL A4 A5)
+     (COND
+      A
+      (COND
+       (EQUAL A5 (CAR A))
+       (COND
+        (MONOT1 A)
+        (COND
+         (EQUAL B A2)
+         T
+         (COND
+          (EQUAL B A4)
+          T
+          (COND
+            (EQUAL B A5)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+        T)
+       T)
+      (COND
+       (EQUAL B A2)
+       T
+       (COND
+            (EQUAL B A4)
+            T
+            (COND (EQUAL B A5)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+     T)
+    T))
+  NIL)
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (COND
+      (EQUAL A2 A4)
+      (COND (EQUAL B A2)
+            T
+            (COND (EQUAL B A4)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))
+      T)
+ (COND
+  (EQUAL A2 A5)
+  T
+  (COND
+   (EQUAL A2 A4)
+   (COND
+    (EQUAL A4 A5)
+    (COND
+     A
+     (COND
+      (EQUAL A5 (CAR A))
+      (COND
+       (MONOT1 A)
+       (COND
+        (EQUAL B A2)
+        T
+        (COND
+         (EQUAL B A4)
+         T
+         (COND
+            (EQUAL B A5)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+       T)
+      T)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (EQUAL B A5)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+    T)
+   T))
+ NIL).
+
+FERTILIZE WITH (EQUAL A2 A4).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (COND (EQUAL B A2)
+       T
+       (COND (EQUAL B A2)
+             T
+             (COND (EQUAL A2 A3)
+                   (COND (EQUAL A3 A2)
+                         (COND (EQUAL B A3)
+                               (COND (EQUAL A2 B)
+                                     (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                     T)
+                               T)
+                         T)
+                   T)))
+ (COND
+  (EQUAL A2 A5)
+  T
+  (COND
+   (EQUAL A2 A4)
+   (COND
+    (EQUAL A4 A5)
+    (COND
+     A
+     (COND
+      (EQUAL A5 (CAR A))
+      (COND
+       (MONOT1 A)
+       (COND
+        (EQUAL B A2)
+        T
+        (COND
+         (EQUAL B A4)
+         T
+         (COND
+            (EQUAL B A5)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+       T)
+      T)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (EQUAL B A5)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+    T)
+   T))
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (COND (EQUAL B A2)
+       T
+       (COND (EQUAL A2 A3)
+             (COND (EQUAL A3 A2)
+                   (COND (EQUAL B A3)
+                         (COND (EQUAL A2 B)
+                               (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                               T)
+                         T)
+                   T)
+             T))
+ (COND
+  (EQUAL A2 A5)
+  T
+  (COND
+   (EQUAL A2 A4)
+   (COND
+    (EQUAL A4 A5)
+    (COND
+     A
+     (COND
+      (EQUAL A5 (CAR A))
+      (COND
+       (MONOT1 A)
+       (COND
+        (EQUAL B A2)
+        T
+        (COND
+         (EQUAL B A4)
+         T
+         (COND
+            (EQUAL B A5)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+       T)
+      T)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (EQUAL B A5)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+    T)
+   T))
+ NIL).
+
+FERTILIZE WITH (EQUAL A2 A3).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (COND (EQUAL B A2)
+       T
+       (COND (EQUAL A2 A2)
+             (COND (EQUAL B A2)
+                   (COND (EQUAL A2 B)
+                         (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                         T)
+                   T)
+             T))
+ (COND
+  (EQUAL A2 A5)
+  T
+  (COND
+   (EQUAL A2 A4)
+   (COND
+    (EQUAL A4 A5)
+    (COND
+     A
+     (COND
+      (EQUAL A5 (CAR A))
+      (COND
+       (MONOT1 A)
+       (COND
+        (EQUAL B A2)
+        T
+        (COND
+         (EQUAL B A4)
+         T
+         (COND
+            (EQUAL B A5)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+       T)
+      T)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (EQUAL B A5)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+    T)
+   T))
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND
+ (EQUAL A2 A5)
+ T
+ (COND
+  (EQUAL A2 A4)
+  (COND
+   (EQUAL A4 A5)
+   (COND
+    A
+    (COND
+     (EQUAL A5 (CAR A))
+     (COND
+      (MONOT1 A)
+      (COND
+       (EQUAL B A2)
+       T
+       (COND
+        (EQUAL B A4)
+        T
+        (COND
+            (EQUAL B A5)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+      T)
+     T)
+    (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A4)
+            T
+            (COND (EQUAL B A5)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+   T)
+  T)).
+
+FERTILIZE WITH (EQUAL A2 A4).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (EQUAL A2 A5)
+ T
+ (COND
+  (EQUAL A2 A5)
+  (COND
+   A
+   (COND
+    (EQUAL A5 (CAR A))
+    (COND
+     (MONOT1 A)
+     (COND
+      (EQUAL B A2)
+      T
+      (COND
+       (EQUAL B A2)
+       T
+       (COND
+            (EQUAL B A5)
+            T
+            (COND (MEMBER B A)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+     T)
+    T)
+   (COND
+      (EQUAL B A2)
+      T
+      (COND (EQUAL B A2)
+            T
+            (COND (EQUAL B A5)
+                  T
+                  (COND (EQUAL A2 A3)
+                        (COND (EQUAL A3 A2)
+                              (COND (EQUAL B A3)
+                                    (COND (EQUAL A2 B)
+                                          (COND (EQUAL A1 A2) (EQUAL A1 B) T)
+                                          T)
+                                    T)
+                              T)
+                        T)))))
+  T)).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-49 (LTE (CDRN A B) B))
+MUST TRY INDUCTION.
+
+INDUCT ON B AND A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (LTE (CDRN A NIL) NIL)
+          (LTE (CDRN NIL B) B))
+     (IMPLIES (LTE (CDRN A B) B)
+              (LTE (CDRN (CONS A1 A) (CONS B1 B))
+                   (CONS B1 B)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (LTE B B)
+      (COND (LTE (CDRN A B) B)
+            (LTE (CDRN A B) (CONS B1 B))
+            T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (LTE NIL NIL)
+           (IMPLIES (LTE B B)
+                    (LTE (CONS B2 B) (CONS B2 B))))
+      (COND (LTE (CDRN A B3) B3)
+            (LTE (CDRN A B3) (CONS B1 B3))
+            T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (LTE (CDRN A B3) B3)
+      (LTE (CDRN A B3) (CONS B1 B3))
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (CDRN A B3) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(COND (LTE GENRL1 B3) (LTE GENRL1 (CONS B1 B3)) T)
+
+MUST TRY INDUCTION.
+
+INDUCT ON B3 AND GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (LTE GENRL1 NIL)
+                (LTE GENRL1 (CONS B1 NIL))
+                T)
+          (COND (LTE NIL B3)
+                (LTE NIL (CONS B1 B3))
+                T))
+     (IMPLIES (COND (LTE GENRL1 B3)
+                    (LTE GENRL1 (CONS B1 B3))
+                    T)
+              (COND (LTE (CONS GENRL2 GENRL1) (CONS B4 B3))
+                    (LTE (CONS GENRL2 GENRL1)
+                         (CONS B1 (CONS B4 B3)))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND (LTE GENRL1 B3)
+      (COND (LTE GENRL1 (CONS B1 B3))
+            (LTE GENRL1 (CONS B4 B3))
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B3 AND GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (LTE GENRL1 NIL)
+                (COND (LTE GENRL1 (CONS B1 NIL))
+                      (LTE GENRL1 (CONS B4 NIL))
+                      T)
+                T)
+          (COND (LTE NIL B3)
+                (COND (LTE NIL (CONS B1 B3))
+                      (LTE NIL (CONS B4 B3))
+                      T)
+                T))
+     (IMPLIES (COND (LTE GENRL1 B3)
+                    (COND (LTE GENRL1 (CONS B1 B3))
+                          (LTE GENRL1 (CONS B4 B3))
+                          T)
+                    T)
+              (COND (LTE (CONS GENRL2 GENRL1) (CONS B5 B3))
+                    (COND (LTE (CONS GENRL2 GENRL1)
+                               (CONS B1 (CONS B5 B3)))
+                          (LTE (CONS GENRL2 GENRL1)
+                               (CONS B4 (CONS B5 B3)))
+                          T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-50
+               (EQUAL (MEMBER A (SORT B))
+                      (MEMBER A B)))
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (MEMBER A (SORT NIL))
+            (MEMBER A NIL))
+     (IMPLIES (EQUAL (MEMBER A (SORT B)) (MEMBER A B))
+              (EQUAL (MEMBER A (SORT (CONS B1 B)))
+                     (MEMBER A (CONS B1 B))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (MEMBER A (SORT B)) (MEMBER A B))
+      (COND (EQUAL A B1)
+            (MEMBER A (ADDTOLIST B1 (SORT B)))
+            (EQUAL (MEMBER A (ADDTOLIST B1 (SORT B)))
+                   (MEMBER A B)))
+      T).
+
+FERTILIZE WITH (EQUAL (MEMBER A (SORT B)) (MEMBER A B)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL A B1)
+      (MEMBER A (ADDTOLIST B1 (SORT B)))
+      (EQUAL (MEMBER A (ADDTOLIST B1 (SORT B)))
+             (MEMBER A (SORT B)))).
+
+FERTILIZE WITH (EQUAL A B1).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (MEMBER A (ADDTOLIST A (SORT B)))
+      (COND (EQUAL (MEMBER A (ADDTOLIST B1 (SORT B)))
+                   (MEMBER A (SORT B)))
+            T (EQUAL A B1))
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (MEMBER A (ADDTOLIST A (SORT NIL)))
+           (IMPLIES (MEMBER A (ADDTOLIST A (SORT B)))
+                    (MEMBER A (ADDTOLIST A (SORT (CONS B2 B))))))
+      (COND (EQUAL (MEMBER A (ADDTOLIST B1 (SORT B3)))
+                   (MEMBER A (SORT B3)))
+            T (EQUAL A B1))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (MEMBER A (ADDTOLIST A (SORT B)))
+            (MEMBER A (ADDTOLIST A (ADDTOLIST B2 (SORT B))))
+            T)
+      (COND (EQUAL (MEMBER A (ADDTOLIST B1 (SORT B3)))
+                   (MEMBER A (SORT B3)))
+            T (EQUAL A B1))
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+GENERALIZE COMMON SUBTERM BY REPLACING (SORT B) BY GENRL1.
+
+THE GENERALIZED (first conjunct) TERM IS:
+(COND (MEMBER A (ADDTOLIST A GENRL1))
+      (MEMBER A (ADDTOLIST A (ADDTOLIST B2 GENRL1)))
+      T)
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (AND
+    (COND (MEMBER A (ADDTOLIST A NIL))
+          (MEMBER A (ADDTOLIST A (ADDTOLIST B2 NIL)))
+          T)
+    (IMPLIES (COND (MEMBER A (ADDTOLIST A GENRL1))
+                   (MEMBER A (ADDTOLIST A (ADDTOLIST B2 GENRL1)))
+                   T)
+             (COND (MEMBER A (ADDTOLIST A (CONS GENRL2 GENRL1)))
+                   (MEMBER A
+                           (ADDTOLIST A (ADDTOLIST B2 (CONS GENRL2 GENRL1))))
+                   T)))
+ (COND (EQUAL (MEMBER A (ADDTOLIST B1 (SORT B3)))
+              (MEMBER A (SORT B3)))
+       T (EQUAL A B1))
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (MEMBER A (ADDTOLIST B1 (SORT B3)))
+             (MEMBER A (SORT B3)))
+      T (EQUAL A B1)).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (SORT B3) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(COND (EQUAL (MEMBER A (ADDTOLIST B1 GENRL1))
+             (MEMBER A GENRL1))
+      T (EQUAL A B1))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (EQUAL (MEMBER A (ADDTOLIST B1 NIL))
+                  (MEMBER A NIL))
+           T (EQUAL A B1))
+     (IMPLIES (COND (EQUAL (MEMBER A (ADDTOLIST B1 GENRL1))
+                           (MEMBER A GENRL1))
+                    T (EQUAL A B1))
+              (COND (EQUAL (MEMBER A (ADDTOLIST B1 (CONS GENRL2 GENRL1)))
+                           (MEMBER A (CONS GENRL2 GENRL1)))
+                    T (EQUAL A B1)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-51
+               (EQUAL (LENGTH A) (LENGTH (SORT A))))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LENGTH NIL) (LENGTH (SORT NIL)))
+     (IMPLIES (EQUAL (LENGTH A) (LENGTH (SORT A)))
+              (EQUAL (LENGTH (CONS A1 A))
+                     (LENGTH (SORT (CONS A1 A)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (LENGTH A) (LENGTH (SORT A)))
+      (EQUAL (CONS NIL (LENGTH A))
+             (LENGTH (ADDTOLIST A1 (SORT A))))
+      T).
+
+FERTILIZE WITH (EQUAL (LENGTH A) (LENGTH (SORT A))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(EQUAL (CONS NIL (LENGTH (SORT A)))
+       (LENGTH (ADDTOLIST A1 (SORT A)))).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (SORT A) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(EQUAL (CONS NIL (LENGTH GENRL1)) (LENGTH (ADDTOLIST A1 GENRL1)))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (CONS NIL (LENGTH NIL))
+            (LENGTH (ADDTOLIST A1 NIL)))
+     (IMPLIES (EQUAL (CONS NIL (LENGTH GENRL1))
+                     (LENGTH (ADDTOLIST A1 GENRL1)))
+              (EQUAL (CONS NIL (LENGTH (CONS GENRL2 GENRL1)))
+                     (LENGTH (ADDTOLIST A1 (CONS GENRL2 GENRL1)))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-52
+               (EQUAL (COUNT A B) (COUNT A (SORT B))))
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (COUNT A NIL)
+            (COUNT A (SORT NIL)))
+     (IMPLIES (EQUAL (COUNT A B) (COUNT A (SORT B)))
+              (EQUAL (COUNT A (CONS B1 B))
+                     (COUNT A (SORT (CONS B1 B)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (COUNT A B) (COUNT A (SORT B)))
+      (COND (EQUAL A B1)
+            (EQUAL (CONS NIL (COUNT A B))
+                   (COUNT A (ADDTOLIST B1 (SORT B))))
+            (EQUAL (COUNT A B)
+                   (COUNT A (ADDTOLIST B1 (SORT B)))))
+      T).
+
+FERTILIZE WITH (EQUAL (COUNT A B) (COUNT A (SORT B))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL A B1)
+      (EQUAL (CONS NIL (COUNT A (SORT B)))
+             (COUNT A (ADDTOLIST B1 (SORT B))))
+      (EQUAL (COUNT A (SORT B))
+             (COUNT A (ADDTOLIST B1 (SORT B))))).
+
+FERTILIZE WITH (EQUAL A B1).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL (CONS NIL (COUNT A (SORT B)))
+             (COUNT A (ADDTOLIST A (SORT B))))
+      (COND (EQUAL (COUNT A (SORT B))
+                   (COUNT A (ADDTOLIST B1 (SORT B))))
+            T (EQUAL A B1))
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+GENERALIZE COMMON SUBTERM BY REPLACING (SORT B) BY GENRL1.
+
+THE GENERALIZED (first conjunct) TERM IS:
+(EQUAL (CONS NIL (COUNT A GENRL1)) (COUNT A (ADDTOLIST A GENRL1)))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (EQUAL (CONS NIL (COUNT A NIL))
+                  (COUNT A (ADDTOLIST A NIL)))
+           (IMPLIES (EQUAL (CONS NIL (COUNT A GENRL1))
+                           (COUNT A (ADDTOLIST A GENRL1)))
+                    (EQUAL (CONS NIL (COUNT A (CONS GENRL2 GENRL1)))
+                           (COUNT A (ADDTOLIST A (CONS GENRL2 GENRL1))))))
+      (COND (EQUAL (COUNT A (SORT B))
+                   (COUNT A (ADDTOLIST B1 (SORT B))))
+            T (EQUAL A B1))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (COUNT A (SORT B))
+             (COUNT A (ADDTOLIST B1 (SORT B))))
+      T (EQUAL A B1)).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (SORT B) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(COND (EQUAL (COUNT A GENRL1)
+             (COUNT A (ADDTOLIST B1 GENRL1)))
+      T (EQUAL A B1))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (EQUAL (COUNT A NIL)
+                  (COUNT A (ADDTOLIST B1 NIL)))
+           T (EQUAL A B1))
+     (IMPLIES (COND (EQUAL (COUNT A GENRL1)
+                           (COUNT A (ADDTOLIST B1 GENRL1)))
+                    T (EQUAL A B1))
+              (COND (EQUAL (COUNT A (CONS GENRL2 GENRL1))
+                           (COUNT A (ADDTOLIST B1 (CONS GENRL2 GENRL1))))
+                    T (EQUAL A B1)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-53
+               (IMPLIES (ORDERED A)
+                        (EQUAL A (SORT A))))
+WHICH IS EQUIVALENT TO:
+(COND (ORDERED A) (EQUAL A (SORT A)) T).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (ORDERED NIL)
+           (EQUAL NIL (SORT NIL))
+           T)
+     (AND (COND (ORDERED (CONS A1 NIL))
+                (EQUAL (CONS A1 NIL)
+                       (SORT (CONS A1 NIL)))
+                T)
+          (IMPLIES (COND (ORDERED (CONS A2 A))
+                         (EQUAL (CONS A2 A) (SORT (CONS A2 A)))
+                         T)
+                   (COND (ORDERED (CONS A1 (CONS A2 A)))
+                         (EQUAL (CONS A1 (CONS A2 A))
+                                (SORT (CONS A1 (CONS A2 A))))
+                         T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND A
+      (COND (LTE A2 (CAR A))
+            (COND (ORDERED A)
+                  (COND (EQUAL (CONS A2 A)
+                               (ADDTOLIST A2 (SORT A)))
+                        (COND (LTE A1 A2)
+                              (EQUAL (CONS A1 (CONS A2 A))
+                                     (ADDTOLIST A1 (ADDTOLIST A2 (SORT A))))
+                              T)
+                        T)
+                  T)
+            T)
+      T).
+
+FERTILIZE WITH (EQUAL (CONS A2 A) (ADDTOLIST A2 (SORT A))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A
+      (COND (LTE A2 (CAR A))
+            (COND (ORDERED A)
+                  (COND (LTE A1 A2)
+                        (EQUAL (CONS A1 (CONS A2 A))
+                               (ADDTOLIST A1 (CONS A2 A)))
+                        T)
+                  T)
+            T)
+      T).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-54
+               (IMPLIES (ORDERED (APPEND A B))
+                        (ORDERED A)))
+WHICH IS EQUIVALENT TO:
+(COND (ORDERED (APPEND A B))
+      (ORDERED A)
+      T).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (ORDERED (APPEND NIL B))
+           (ORDERED NIL)
+           T)
+     (AND (COND (ORDERED (APPEND (CONS A1 NIL) B))
+                (ORDERED (CONS A1 NIL))
+                T)
+          (IMPLIES (COND (ORDERED (APPEND (CONS A2 A) B))
+                         (ORDERED (CONS A2 A))
+                         T)
+                   (COND (ORDERED (APPEND (CONS A1 (CONS A2 A)) B))
+                         (ORDERED (CONS A1 (CONS A2 A)))
+                         T)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-55
+               (IMPLIES (ORDERED (APPEND A B))
+                        (ORDERED B)))
+WHICH IS EQUIVALENT TO:
+(COND (ORDERED (APPEND A B))
+      (ORDERED B)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (ORDERED (APPEND NIL B))
+           (ORDERED B)
+           T)
+     (IMPLIES (COND (ORDERED (APPEND A B))
+                    (ORDERED B)
+                    T)
+              (COND (ORDERED (APPEND (CONS A1 A) B))
+                    (ORDERED B)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND (ORDERED (APPEND A B))
+      T (COND (APPEND A B) T (ORDERED B))).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (ORDERED (APPEND NIL B))
+           T (COND (APPEND NIL B) T (ORDERED B)))
+     (IMPLIES (COND (ORDERED (APPEND A B))
+                    T (COND (APPEND A B) T (ORDERED B)))
+              (COND (ORDERED (APPEND (CONS A1 A) B))
+                    T
+                    (COND (APPEND (CONS A1 A) B)
+                          T (ORDERED B))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (ORDERED B) T (COND B T NIL)).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (ORDERED NIL) T (COND NIL T NIL))
+     (AND (COND (ORDERED (CONS B1 NIL))
+                T (COND (CONS B1 NIL) T NIL))
+          (IMPLIES (COND (ORDERED (CONS B2 B))
+                         T (COND (CONS B2 B) T NIL))
+                   (COND (ORDERED (CONS B1 (CONS B2 B)))
+                         T
+                         (COND (CONS B1 (CONS B2 B)) T NIL))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-56
+               (EQUAL (EQUAL (SORT A) A) (ORDERED A)))
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (SORT A) A)
+      (ORDERED A)
+      (COND (ORDERED A) NIL T)).
+
+FERTILIZE WITH (EQUAL (SORT A) A).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (ORDERED (SORT A))
+      (COND (COND (ORDERED A) NIL T)
+            T (EQUAL (SORT A) A))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (ORDERED (SORT A))
+      (COND (ORDERED A) (EQUAL (SORT A) A) T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (ORDERED (SORT NIL))
+           (IMPLIES (ORDERED (SORT A))
+                    (ORDERED (SORT (CONS A1 A)))))
+      (COND (ORDERED A2)
+            (EQUAL (SORT A2) A2)
+            T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (ORDERED (SORT A))
+            (ORDERED (ADDTOLIST A1 (SORT A)))
+            T)
+      (COND (ORDERED A2)
+            (EQUAL (SORT A2) A2)
+            T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+GENERALIZE COMMON SUBTERM BY REPLACING (SORT A) BY GENRL1.
+
+THE GENERALIZED (first conjunct) TERM IS:
+(COND (ORDERED GENRL1) (ORDERED (ADDTOLIST A1 GENRL1)) T)
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND
+ (AND
+  (COND (ORDERED NIL)
+        (ORDERED (ADDTOLIST A1 NIL))
+        T)
+  (AND
+   (COND (ORDERED (CONS GENRL2 NIL))
+         (ORDERED (ADDTOLIST A1 (CONS GENRL2 NIL)))
+         T)
+   (IMPLIES (COND (ORDERED (CONS GENRL3 GENRL1))
+                  (ORDERED (ADDTOLIST A1 (CONS GENRL3 GENRL1)))
+                  T)
+            (COND (ORDERED (CONS GENRL2 (CONS GENRL3 GENRL1)))
+                  (ORDERED (ADDTOLIST A1 (CONS GENRL2 (CONS GENRL3 GENRL1))))
+                  T))))
+ (COND (ORDERED A2)
+       (EQUAL (SORT A2) A2)
+       T)
+ NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND (LTE A1 GENRL2) T (LTE GENRL2 A1))
+      (COND (ORDERED A2)
+            (EQUAL (SORT A2) A2)
+            T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON A1 AND GENRL2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (AND (COND (LTE NIL GENRL2)
+                      T (LTE GENRL2 NIL))
+                (COND (LTE A1 NIL) T (LTE NIL A1)))
+           (IMPLIES (COND (LTE A1 GENRL2) T (LTE GENRL2 A1))
+                    (COND (LTE (CONS A3 A1) (CONS GENRL3 GENRL2))
+                          T
+                          (LTE (CONS GENRL3 GENRL2)
+                               (CONS A3 A1)))))
+      (COND (ORDERED A2)
+            (EQUAL (SORT A2) A2)
+            T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (ORDERED A2)
+      (EQUAL (SORT A2) A2)
+      T).
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (ORDERED NIL)
+           (EQUAL (SORT NIL) NIL)
+           T)
+     (AND (COND (ORDERED (CONS A3 NIL))
+                (EQUAL (SORT (CONS A3 NIL))
+                       (CONS A3 NIL))
+                T)
+          (IMPLIES (COND (ORDERED (CONS A4 A2))
+                         (EQUAL (SORT (CONS A4 A2)) (CONS A4 A2))
+                         T)
+                   (COND (ORDERED (CONS A3 (CONS A4 A2)))
+                         (EQUAL (SORT (CONS A3 (CONS A4 A2)))
+                                (CONS A3 (CONS A4 A2)))
+                         T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND A2
+      (COND (LTE A4 (CAR A2))
+            (COND (ORDERED A2)
+                  (COND (EQUAL (ADDTOLIST A4 (SORT A2))
+                               (CONS A4 A2))
+                        (COND (LTE A3 A4)
+                              (EQUAL (ADDTOLIST A3 (ADDTOLIST A4 (SORT A2)))
+                                     (CONS A3 (CONS A4 A2)))
+                              T)
+                        T)
+                  T)
+            T)
+      T).
+
+FERTILIZE WITH (EQUAL (ADDTOLIST A4 (SORT A2)) (CONS A4 A2)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A2
+      (COND (LTE A4 (CAR A2))
+            (COND (ORDERED A2)
+                  (COND (LTE A3 A4)
+                        (EQUAL (ADDTOLIST A3 (CONS A4 A2))
+                               (CONS A3 (CONS A4 A2)))
+                        T)
+                  T)
+            T)
+      T).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-57 (LTE (HALF A) A))
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (LTE (HALF NIL) NIL)
+     (AND (LTE (HALF (CONS A1 NIL)) (CONS A1 NIL))
+          (IMPLIES (LTE (HALF A) A)
+                   (LTE (HALF (CONS A1 (CONS A2 A)))
+                        (CONS A1 (CONS A2 A)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (LTE (HALF A) A)
+      (LTE (HALF A) (CONS A2 A))
+      T).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (HALF A) BY GENRL1.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL1) (COND (LTE GENRL1 A) (LTE GENRL1 (CONS A2 A)) T))
+
+MUST TRY INDUCTION.
+
+INDUCT ON A AND GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (IMPLIES (NUMBERP GENRL1)
+                   (COND (LTE GENRL1 NIL)
+                         (LTE GENRL1 (CONS A2 NIL))
+                         T))
+          (IMPLIES (NUMBERP NIL)
+                   (COND (LTE NIL A)
+                         (LTE NIL (CONS A2 A))
+                         T)))
+     (IMPLIES (IMPLIES (NUMBERP GENRL1)
+                       (COND (LTE GENRL1 A)
+                             (LTE GENRL1 (CONS A2 A))
+                             T))
+              (IMPLIES (NUMBERP (CONS GENRL2 GENRL1))
+                       (COND (LTE (CONS GENRL2 GENRL1) (CONS A3 A))
+                             (LTE (CONS GENRL2 GENRL1)
+                                  (CONS A2 (CONS A3 A)))
+                             T)))).
+
+WHICH IS EQUIVALENT TO:
+(COND (NUMBERP GENRL1)
+      (COND (LTE GENRL1 A)
+            (COND (LTE GENRL1 (CONS A2 A))
+                  (COND GENRL2 T (LTE GENRL1 (CONS A3 A)))
+                  T)
+            T)
+      T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON A AND GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (NUMBERP GENRL1)
+                (COND (LTE GENRL1 NIL)
+                      (COND (LTE GENRL1 (CONS A2 NIL))
+                            (COND GENRL2 T (LTE GENRL1 (CONS A3 NIL)))
+                            T)
+                      T)
+                T)
+          (COND (NUMBERP NIL)
+                (COND (LTE NIL A)
+                      (COND (LTE NIL (CONS A2 A))
+                            (COND GENRL2 T (LTE NIL (CONS A3 A)))
+                            T)
+                      T)
+                T))
+     (IMPLIES (COND (NUMBERP GENRL1)
+                    (COND (LTE GENRL1 A)
+                          (COND (LTE GENRL1 (CONS A2 A))
+                                (COND GENRL2 T (LTE GENRL1 (CONS A3 A)))
+                                T)
+                          T)
+                    T)
+              (COND (NUMBERP (CONS GENRL3 GENRL1))
+                    (COND (LTE (CONS GENRL3 GENRL1) (CONS A4 A))
+                          (COND (LTE (CONS GENRL3 GENRL1)
+                                     (CONS A2 (CONS A4 A)))
+                                (COND GENRL2 T
+                                      (LTE (CONS GENRL3 GENRL1)
+                                           (CONS A3 (CONS A4 A))))
+                                T)
+                          T)
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-58 (EQUAL (COPY A) A))
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (COPY NIL) NIL)
+     (IMPLIES (AND (EQUAL (COPY A1) A1)
+                   (EQUAL (COPY A) A))
+              (EQUAL (COPY (CONS A1 A))
+                     (CONS A1 A)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-59
+               (EQUAL (EQUALP A B) (EQUAL A B)))
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL A B)
+      (EQUALP A B)
+      (COND (EQUALP A B) NIL T)).
+
+FERTILIZE WITH (EQUAL A B).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUALP A A)
+      (COND (COND (EQUALP A B) NIL T)
+            T (EQUAL A B))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUALP A A)
+      (COND (EQUALP A B) (EQUAL A B) T)
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (EQUALP NIL NIL)
+           (IMPLIES (AND (EQUALP A1 A1) (EQUALP A A))
+                    (EQUALP (CONS A1 A) (CONS A1 A))))
+      (COND (EQUALP A2 B) (EQUAL A2 B) T)
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUALP A2 B) (EQUAL A2 B) T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B AND A2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (COND (EQUALP A2 NIL) (EQUAL A2 NIL) T)
+          (COND (EQUALP NIL B) (EQUAL NIL B) T))
+     (IMPLIES (AND (COND (EQUALP A3 B1) (EQUAL A3 B1) T)
+                   (COND (EQUALP A2 B) (EQUAL A2 B) T))
+              (COND (EQUALP (CONS A3 A2) (CONS B1 B))
+                    (EQUAL (CONS A3 A2) (CONS B1 B))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-60 (EQUAL (SUBST A A B) B))
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (SUBST A A NIL) NIL)
+     (IMPLIES (AND (EQUAL (SUBST A A B1) B1)
+                   (EQUAL (SUBST A A B) B))
+              (EQUAL (SUBST A A (CONS B1 B))
+                     (CONS B1 B)))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-61
+               (IMPLIES (MEMBER A B) (OCCUR A B)))
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B) (OCCUR A B) T).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (MEMBER A NIL) (OCCUR A NIL) T)
+     (IMPLIES (AND (COND (MEMBER A B1) (OCCUR A B1) T)
+                   (COND (MEMBER A B) (OCCUR A B) T))
+              (COND (MEMBER A (CONS B1 B))
+                    (OCCUR A (CONS B1 B))
+                    T))).
+
+WHICH IS EQUIVALENT TO:
+(COND (MEMBER A B1)
+      T
+      (COND (MEMBER A B)
+            T
+            (COND (EQUAL A B1)
+                  (COND (EQUAL A (CONS B1 B))
+                        T (COND (OCCUR A B1) T (OCCUR A B)))
+                  T))).
+
+FERTILIZE WITH (EQUAL A B1).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (MEMBER A B1)
+      T
+      (COND (MEMBER A B)
+            T
+            (COND (EQUAL A (CONS A B))
+                  T (COND (OCCUR A A) T (OCCUR A B))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-62
+               (IMPLIES (NOT (OCCUR A B))
+                        (EQUAL (SUBST C A B) B)))
+WHICH IS EQUIVALENT TO:
+(COND (OCCUR A B)
+      T (EQUAL (SUBST C A B) B)).
+
+MUST TRY INDUCTION.
+
+INDUCT ON B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND (OCCUR A NIL)
+           T (EQUAL (SUBST C A NIL) NIL))
+     (IMPLIES (AND (COND (OCCUR A B1)
+                         T (EQUAL (SUBST C A B1) B1))
+                   (COND (OCCUR A B)
+                         T (EQUAL (SUBST C A B) B)))
+              (COND (OCCUR A (CONS B1 B))
+                    T
+                    (EQUAL (SUBST C A (CONS B1 B))
+                           (CONS B1 B))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-63
+               (EQUAL (EQUALP A B) (EQUALP B A)))
+MUST TRY INDUCTION.
+
+INDUCT ON A AND B.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (AND (EQUAL (EQUALP NIL B) (EQUALP B NIL))
+          (EQUAL (EQUALP A NIL) (EQUALP NIL A)))
+     (IMPLIES (AND (EQUAL (EQUALP A1 B1) (EQUALP B1 A1))
+                   (EQUAL (EQUALP A B) (EQUALP B A)))
+              (EQUAL (EQUALP (CONS A1 A) (CONS B1 B))
+                     (EQUALP (CONS B1 B) (CONS A1 A))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (EQUALP A1 B1) (EQUALP B1 A1))
+      (COND (EQUAL (EQUALP A B) (EQUALP B A))
+            (COND (EQUALP A1 B1)
+                  (COND (EQUALP A B) (EQUALP B1 A1) T)
+                  (COND (EQUALP B1 A1)
+                        (COND (EQUALP B A) NIL T)
+                        T))
+            T)
+      T).
+
+FERTILIZE WITH (EQUAL (EQUALP A1 B1) (EQUALP B1 A1)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL (EQUALP A B) (EQUALP B A))
+      (COND (EQUALP A1 B1)
+            (COND (EQUALP A B) (EQUALP A1 B1) T)
+            (COND (EQUALP A1 B1)
+                  (COND (EQUALP B A) NIL T)
+                  T))
+      T).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-64
+               (IMPLIES (AND (EQUAL A B) (EQUALP B C))
+                        (EQUALP A C)))
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL A B)
+      (COND (EQUALP B C) (EQUALP A C) T)
+      T).
+
+FERTILIZE WITH (EQUAL A B).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUALP A C) (EQUALP A C) T).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-65
+               (EQUAL (SWAPTREE (SWAPTREE A)) A))
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (SWAPTREE (SWAPTREE NIL)) NIL)
+     (AND (EQUAL (SWAPTREE (SWAPTREE (CONS A1 NIL)))
+                 (CONS A1 NIL))
+          (IMPLIES (AND (EQUAL (SWAPTREE (SWAPTREE A2)) A2)
+                        (EQUAL (SWAPTREE (SWAPTREE A)) A))
+                   (EQUAL (SWAPTREE (SWAPTREE (CONS A1 (CONS A2 A))))
+                          (CONS A1 (CONS A2 A)))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-66
+               (EQUAL (FLATTEN (SWAPTREE A))
+                      (REVERSE (FLATTEN A))))
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (FLATTEN (SWAPTREE NIL))
+            (REVERSE (FLATTEN NIL)))
+     (AND (EQUAL (FLATTEN (SWAPTREE (CONS A1 NIL)))
+                 (REVERSE (FLATTEN (CONS A1 NIL))))
+          (IMPLIES (AND (EQUAL (FLATTEN (SWAPTREE A2))
+                               (REVERSE (FLATTEN A2)))
+                        (EQUAL (FLATTEN (SWAPTREE A))
+                               (REVERSE (FLATTEN A))))
+                   (EQUAL (FLATTEN (SWAPTREE (CONS A1 (CONS A2 A))))
+                          (REVERSE (FLATTEN (CONS A1 (CONS A2 A)))))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (FLATTEN (SWAPTREE A2))
+             (REVERSE (FLATTEN A2)))
+      (COND (EQUAL (FLATTEN (SWAPTREE A))
+                   (REVERSE (FLATTEN A)))
+            (COND A1 T
+                  (EQUAL (APPEND (FLATTEN (SWAPTREE A))
+                                 (FLATTEN (SWAPTREE A2)))
+                         (REVERSE (APPEND (FLATTEN A2) (FLATTEN A)))))
+            T)
+      T).
+
+FERTILIZE WITH (EQUAL (FLATTEN (SWAPTREE A2)) (REVERSE (FLATTEN A2))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL (FLATTEN (SWAPTREE A))
+             (REVERSE (FLATTEN A)))
+      (COND A1 T
+            (EQUAL (APPEND (FLATTEN (SWAPTREE A))
+                           (REVERSE (FLATTEN A2)))
+                   (REVERSE (APPEND (FLATTEN A2) (FLATTEN A)))))
+      T).
+
+FERTILIZE WITH (EQUAL (FLATTEN (SWAPTREE A)) (REVERSE (FLATTEN A))).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A1 T
+      (EQUAL (APPEND (REVERSE (FLATTEN A))
+                     (REVERSE (FLATTEN A2)))
+             (REVERSE (APPEND (FLATTEN A2) (FLATTEN A))))).
+
+GENERALIZE COMMON SUBTERMS BY REPLACING (FLATTEN A2) BY GENRL1 AND
+(FLATTEN A) BY GENRL2.
+
+THE GENERALIZED TERM IS:
+(COND A1 T
+      (EQUAL (APPEND (REVERSE GENRL2)
+                     (REVERSE GENRL1))
+             (REVERSE (APPEND GENRL1 GENRL2))))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND A1 T
+           (EQUAL (APPEND (REVERSE GENRL2) (REVERSE NIL))
+                  (REVERSE (APPEND NIL GENRL2))))
+     (IMPLIES (COND A1 T
+                    (EQUAL (APPEND (REVERSE GENRL2)
+                                   (REVERSE GENRL1))
+                           (REVERSE (APPEND GENRL1 GENRL2))))
+              (COND A1 T
+                    (EQUAL (APPEND (REVERSE GENRL2)
+                                   (REVERSE (CONS GENRL3 GENRL1)))
+                           (REVERSE (APPEND (CONS GENRL3 GENRL1)
+                                            GENRL2)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (COND A1 T
+            (EQUAL (APPEND (REVERSE GENRL2) NIL)
+                   (REVERSE GENRL2)))
+      (COND A1 T
+            (COND (EQUAL (APPEND (REVERSE GENRL2)
+                                 (REVERSE GENRL1))
+                         (REVERSE (APPEND GENRL1 GENRL2)))
+                  (EQUAL (APPEND (REVERSE GENRL2)
+                                 (APPEND (REVERSE GENRL1)
+                                         (CONS GENRL3 NIL)))
+                         (APPEND (REVERSE (APPEND GENRL1 GENRL2))
+                                 (CONS GENRL3 NIL)))
+                  T))
+      NIL).
+
+FERTILIZE WITH 
+(EQUAL (APPEND (REVERSE GENRL2)
+               (REVERSE GENRL1))
+       (REVERSE (APPEND GENRL1 GENRL2))).
+
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (COND A1 T
+            (EQUAL (APPEND (REVERSE GENRL2) NIL)
+                   (REVERSE GENRL2)))
+      (COND A1 T
+            (EQUAL (APPEND (REVERSE GENRL2)
+                           (APPEND (REVERSE GENRL1)
+                                   (CONS GENRL3 NIL)))
+                   (APPEND (APPEND (REVERSE GENRL2)
+                                   (REVERSE GENRL1))
+                           (CONS GENRL3 NIL))))
+      NIL).
+
+(WORK ON FIRST CONJUNCT ONLY)
+
+GENERALIZE COMMON SUBTERM BY REPLACING (REVERSE GENRL2) BY GENRL4.
+
+THE GENERALIZED (first conjunct) TERM IS:
+(COND A1 T (EQUAL (APPEND GENRL4 NIL) GENRL4))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL4.
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (AND (COND A1 T (EQUAL (APPEND NIL NIL) NIL))
+           (IMPLIES (COND A1 T (EQUAL (APPEND GENRL4 NIL) GENRL4))
+                    (COND A1 T
+                          (EQUAL (APPEND (CONS GENRL5 GENRL4) NIL)
+                                 (CONS GENRL5 GENRL4)))))
+      (COND A1 T
+            (EQUAL (APPEND (REVERSE GENRL2)
+                           (APPEND (REVERSE GENRL1)
+                                   (CONS GENRL3 NIL)))
+                   (APPEND (APPEND (REVERSE GENRL2)
+                                   (REVERSE GENRL1))
+                           (CONS GENRL3 NIL))))
+      NIL).
+
+WHICH IS EQUIVALENT TO:
+(COND A1 T
+      (EQUAL (APPEND (REVERSE GENRL2)
+                     (APPEND (REVERSE GENRL1)
+                             (CONS GENRL3 NIL)))
+             (APPEND (APPEND (REVERSE GENRL2)
+                             (REVERSE GENRL1))
+                     (CONS GENRL3 NIL)))).
+
+GENERALIZE COMMON SUBTERMS BY REPLACING (REVERSE GENRL1) BY GENRL4
+AND (REVERSE GENRL2) BY GENRL5.
+
+THE GENERALIZED TERM IS:
+(COND A1 T
+      (EQUAL (APPEND GENRL5
+                     (APPEND GENRL4 (CONS GENRL3 NIL)))
+             (APPEND (APPEND GENRL5 GENRL4)
+                     (CONS GENRL3 NIL))))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL5.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND A1 T
+           (EQUAL (APPEND NIL (APPEND GENRL4 (CONS GENRL3 NIL)))
+                  (APPEND (APPEND NIL GENRL4)
+                          (CONS GENRL3 NIL))))
+     (IMPLIES (COND A1 T
+                    (EQUAL (APPEND GENRL5
+                                   (APPEND GENRL4 (CONS GENRL3 NIL)))
+                           (APPEND (APPEND GENRL5 GENRL4)
+                                   (CONS GENRL3 NIL))))
+              (COND A1 T
+                    (EQUAL (APPEND (CONS GENRL6 GENRL5)
+                                   (APPEND GENRL4 (CONS GENRL3 NIL)))
+                           (APPEND (APPEND (CONS GENRL6 GENRL5) GENRL4)
+                                   (CONS GENRL3 NIL)))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>(PROVE JACM-67
+               (EQUAL (LENGTH (FLATTEN A))
+                      (TIPCOUNT A)))
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (EQUAL (LENGTH (FLATTEN NIL))
+            (TIPCOUNT NIL))
+     (AND (EQUAL (LENGTH (FLATTEN (CONS A1 NIL)))
+                 (TIPCOUNT (CONS A1 NIL)))
+          (IMPLIES (AND (EQUAL (LENGTH (FLATTEN A2))
+                               (TIPCOUNT A2))
+                        (EQUAL (LENGTH (FLATTEN A))
+                               (TIPCOUNT A)))
+                   (EQUAL (LENGTH (FLATTEN (CONS A1 (CONS A2 A))))
+                          (TIPCOUNT (CONS A1 (CONS A2 A))))))).
+
+WHICH IS EQUIVALENT TO:
+(COND (EQUAL (LENGTH (FLATTEN A2))
+             (TIPCOUNT A2))
+      (COND (EQUAL (LENGTH (FLATTEN A))
+                   (TIPCOUNT A))
+            (COND A1 T
+                  (EQUAL (LENGTH (APPEND (FLATTEN A2) (FLATTEN A)))
+                         (ADD (TIPCOUNT A2) (TIPCOUNT A))))
+            T)
+      T).
+
+FERTILIZE WITH (EQUAL (LENGTH (FLATTEN A2)) (TIPCOUNT A2)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND (EQUAL (LENGTH (FLATTEN A))
+             (TIPCOUNT A))
+      (COND A1 T
+            (EQUAL (LENGTH (APPEND (FLATTEN A2) (FLATTEN A)))
+                   (ADD (LENGTH (FLATTEN A2))
+                        (TIPCOUNT A))))
+      T).
+
+FERTILIZE WITH (EQUAL (LENGTH (FLATTEN A)) (TIPCOUNT A)).
+
+THE THEOREM TO BE PROVED IS NOW:
+(COND A1 T
+      (EQUAL (LENGTH (APPEND (FLATTEN A2) (FLATTEN A)))
+             (ADD (LENGTH (FLATTEN A2))
+                  (LENGTH (FLATTEN A))))).
+
+GENERALIZE COMMON SUBTERMS BY REPLACING (FLATTEN A) BY GENRL1 AND 
+(FLATTEN A2) BY GENRL2.
+
+THE GENERALIZED TERM IS:
+(COND A1 T
+      (EQUAL (LENGTH (APPEND GENRL2 GENRL1))
+             (ADD (LENGTH GENRL2) (LENGTH GENRL1))))
+
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (COND A1 T
+           (EQUAL (LENGTH (APPEND NIL GENRL1))
+                  (ADD (LENGTH NIL) (LENGTH GENRL1))))
+     (IMPLIES (COND A1 T
+                    (EQUAL (LENGTH (APPEND GENRL2 GENRL1))
+                           (ADD (LENGTH GENRL2) (LENGTH GENRL1))))
+              (COND A1 T
+                    (EQUAL (LENGTH (APPEND (CONS GENRL3 GENRL2) GENRL1))
+                           (ADD (LENGTH (CONS GENRL3 GENRL2))
+                                (LENGTH GENRL1)))))).
+
+WHICH IS EQUIVALENT TO:
+(COND A1 T
+      (EQUAL (LENGTH GENRL1)
+             (LENGTH (LENGTH GENRL1)))).
+
+GENERALIZE COMMON SUBTERM BY REPLACING (LENGTH GENRL1) BY GENRL2.
+
+THE GENERALIZED TERM IS:
+(IMPLIES (NUMBERP GENRL2) (COND A1 T (EQUAL GENRL2 (LENGTH GENRL2))))
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL2.
+
+THE THEOREM TO BE PROVED IS NOW:
+(AND (IMPLIES (NUMBERP NIL)
+              (COND A1 T (EQUAL NIL (LENGTH NIL))))
+     (IMPLIES (IMPLIES (NUMBERP GENRL2)
+                       (COND A1 T (EQUAL GENRL2 (LENGTH GENRL2))))
+              (IMPLIES (NUMBERP (CONS GENRL3 GENRL2))
+                       (COND A1 T
+                             (EQUAL (CONS GENRL3 GENRL2)
+                                    (LENGTH (CONS GENRL3 GENRL2))))))).
+
+WHICH IS EQUIVALENT TO:
+T.
+
+ QED
+PLTP !>>Bye.
+
+Successful :JACM Proveall by PLTP(A) completed on
+March 24, 2018  12:19:06
+
+((:UNTRANSLATE-ENABLED T)
+ (:UNTRANSLATE-IF-TO-COND T)
+ (:UNTRANSLATE-CONSTANTS T)
+ (:UNTRANSLATE-LOGICAL-CONNECTIVES NIL)
+ (:HELP
+  "(set-feature key val) for keys above or
+      (set-feature :ALL val) with val being one of
+      :defaults, :pltp-notation, or :raw-notation"))
+
+PLTP !>

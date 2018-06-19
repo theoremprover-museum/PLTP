@@ -1,0 +1,85 @@
+<HTML>
+<HEAD>
+<TITLE>Guide to the Transcribed Listings F and H</TITLE>
+</HEAD>
+<BODY TEXT="#000000" 
+      BGCOLOR="FFFFFF"
+      LINK ="#FF0000"
+      VLINK="#A020F0" 
+      ALINK="#FFD700"
+      "fixed">
+
+<CENTER>
+<H1>Guide to the Transcribed Listings F and H</H1>
+<BR>
+J Strother Moore
+<BR>
+Robert S. Boyer
+<BR>
+Grant O. Passmore
+<BR>
+August, 2017
+</CENTER>
+
+<A HREF="listings-f-and-h.txt">listings-f-and-h.txt</A> on this directory is
+is a transcription of
+<A HREF="../scanned-images/Listing-F-OCR.pdf">Listing F</A> and
+<A HREF="../scanned-images/Listing-H-OCR.pdf">Listing H</A> into a simple
+text file.  
+<P>
+We believe this is the complete POP-2 text for PLTP as of 14
+September, 1973.  The file was produced by running the scanned images through
+an OCR processor, grabbing the resulting text from each listing,
+concatenating the two texts, and correcting the obvious OCR errors.  If some
+line in this file looks odd, consult the scanned images.  Please report to
+the authors any correction that should be made to our transcription.
+<P>
+In the event that you have a modern POP-2 compiler and wish to run this code,
+be advised that you will have to solve the various file i/o issues that were
+peculiar to 1973 Edinburgh POP-2/4100 implementation.  A relatively minor
+concern to be addressed is the use of character codes in <CODE>FUNCTION
+ISNUMSKO</CODE> and in the file <CODE>[PPR]</CODE>.  While ASCII or Unicode
+mappings are common today, our transcription preserves the original POP-2
+character-to-integer codes.  So for example, when <CODE>FUNCTION
+ISNUMSKO</CODE> checks that the first character in a name is strictly after
+the letter '<CODE>H</CODE>' and strictly before the letter '<CODE>O</CODE>',
+it uses the codes 40 and 47 for those characters, not say ASCII 72 and 79.
+See the
+<A HREF="../POP-2-4100-Users-Manual-OCR.pdf">POP-2/4100 Users Manual</A> for
+system-related POP-2 features, including Appendix 2, page 66, for the
+then-standard POP-2 character set mapping.
+<P>
+We have tried to be faithful to the POP-2 text in each file, with a few
+exceptions.
+<P>
+The lineprinter banner at the top of each file is transcribed as a POP-2
+comment, e.g.,
+
+<PRE><CODE>
+COMMENT
+*****************************************************************
+[ADDEFS]  TRACK  9                                   [ 21.16 14 SEPT 1973]
+CREATED   20.03   14 9 1973
+;
+</CODE></PRE>
+<P>
+There is a misspelling, in a comment, preserved here but marked with '[sic]'.
+<P>
+There is a typo in a comment, preserved here but marked with '[sic]', stating
+an incorrect version of the correctly implemented COND-distribution rule.
+<P>
+The Edinburgh lineprinter wrapped long lines after 80 characters.  Those
+wrapped lines have been unwrapped.
+<P>
+The identifier <CODE>AVOIDSTAR</CODE> in the <CODE>VARS</CODE> declaration in the first non-<CODE>COMMENT</CODE>
+line of file <CODE>[/ PROVE]</CODE> was actually written as <CODE>AVOIDSTARS</CODE> in the original
+source listing.  The two names are treated identically because the Edinburgh
+POP-2 compiler truncated names to 8 characters.
+<P>
+The identifier <CODE>GENSKOLIST</CODE> called as a function in the definition of <CODE>FUNCTION
+ARTIFINTEL</CODE> in file <CODE>[/ PROVE]</CODE> was actually written <CODE>GENSKOLISTT</CODE> in the
+original listing.  Again, the two names are treated identically by the
+Edinburgh POP-2 compiler.
+
+
+</HTML>

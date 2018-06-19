@@ -1,0 +1,567 @@
+<HTML>
+<HEAD>
+<TITLE>PLTP(A)</TITLE>
+</HEAD>
+<BODY TEXT="#000000" 
+      BGCOLOR="FFFFFF"
+      LINK ="#FF0000"
+      VLINK="#A020F0" 
+      ALINK="#FFD700"
+      "fixed">
+
+<CENTER>
+<H1>PLTP(A):  An ACL2 Implementation of 
+the Edinburgh Pure Lisp Theorem Prover of 1973</H1>
+<BR>
+J Strother Moore
+<BR>
+March, 2018
+</CENTER>
+
+<P>
+<H2>Abstract</H2>
+
+This directory contains a contemporary (2017) implementation of PLTP coded in the
+applicative (functional) Common Lisp of ACL2.  We name this system
+<I>PLTP(A)</I>.  PLTP(A) is <I>almost</I> a translation into ACL2 of the 14
+September, 1973, listing of the POP-2 for PLTP.  We explain the differences
+below.  The material here is organized as follows.  First we summarize the
+main files posted here so you can (i) browse the ACL2 source code for
+PLTP(A), (ii) inspect PLTP(A)'s standard proveall and JACM proveall, including
+the output of PLTP(A) on those regression suites, and (iii) read our argument
+that the two failures in its standard proveall do not indicate a discrepancy
+between PLTP and PLTP(A).  Next, we describe the differences between the
+original PLTP and PLTP(A).  The differences include bug fixes and some
+``gratuitous'' changes to make the new code clearer.  Finally, we explain how
+to get ACL2 and how to run PLTP(A).
+
+<H2>Browsing PLTP(A)</H2>
+
+<B>Note:</B>  If you intend to run PLTP(A) under your local ACL2, we advise you to jump to
+<A HREF="#RunningPLTPA">Running PLTP(A)</A> because the PLTP(A) files mentioned below require
+a certain amount of infrastructure (e.g., the definition of the Common Lisp symbol package named
+<CODE>"PLTP"</CODE>).  But if you merely want to see how PLTP(A) is coded in
+ACL2 and what it can prove, browse here.
+
+
+<UL>
+<LI><A HREF="https://raw.githubusercontent.com/acl2/acl2/master/books/projects/pltpa/pltpa.lisp">ACL2
+source code for PLTP(A)</A>.  PLTP(A) is implemented as a collection
+of <CODE>:PROGRAM</CODE> mode function and macro definitions in ACL2.  A
+brief ``users manual'' is included in the comments at the top of the file.
+
+<P>
+<LI><A HREF="https://raw.githubusercontent.com/acl2/acl2/master/books/projects/pltpa/standard-proveall.lsp">Standard
+Proveall</A> obtained by combining the definitions in the <CODE>[/
+DEFS]</CODE> file of 14 September, 1973, with the <CODE>[THEOREMS]</CODE>
+file of that same date, both of which can be found
+in <A HREF="../scanned-images/Listing-I-OCR.pdf">Listing
+I</A>.  The definitions and theorems here have been transcribed from POP-2's
+square-bracket list notation to standard Lisp notation.  Furthermore, in the
+case of theorems using PLTP's numeric variables, additional
+<CODE>NUMBERP</CODE> hypotheses have been added as explained below.  The output of PLTP(A) on
+this proveall (in ACL2 Version 8.0) is given in <CODE><A HREF="standard-proveall.output.txt">standard-proveall.output.txt</A></CODE>.
+<P>
+<LI><A HREF="https://raw.githubusercontent.com/acl2/acl2/master/books/projects/pltpa/jacm-proveall.lsp">JACM
+Proveall</A> obtained by combining the definitions and theorems from
+Appendices A and B of
+<A HREF="http://www.cs.utexas.edu/users/moore/publications/bm75.pdf">Proving Theorems about LISP Functions</A>, 
+R.S. Boyer and J S. Moore. <I>Journal of the Association for Computing Machinery</I>,
+<B>22</B>(1), 1975, pp.129-144.  Many of the theorems in the JACM paper have
+the same formulas as theorems in the standard proveall, but some of the
+definitions in the JACM paper differ from their counterparts in the standard
+proveall.  The output of PLTP(A) on this proveall (in ACL2 Version 8.0) is
+given
+in <CODE><A HREF="jacm-proveall.output.txt">jacm-proveall.output.txt</A></CODE>.
+<P>
+<LI><A HREF="standard-proveall-failures.lisp">A discussion of the failures in the standard
+proveall</A>.  Two of the theorems in the standard proveall cannot be proved
+by PLTP(A) and have been commented-out of the scripts.  In this discussion we
+argue that those theorems could not possibly have been proved by the 1973
+PLTP either and were in the proveall as challenges to work on.  Part of this
+argument involves proving those theorems in ACL2 itself (not PLTP(A)) and
+those ACL2 proof scripts are included in this discussion.
+</UL>
+
+
+<H2>PLTP v PLTP(A)</H2>
+
+<P>
+The sources for The Edinburgh Pure Lisp Theorem Prover, aka PLTP, as of 14 September, 1973,
+are in <A HREF="../scanned-images/Listing-F-OCR.pdf">Listing-F</A>
+and <A HREF="../scanned-images/Listing-H-OCR.pdf">Listing-H</A>, and have been transcribed
+into text form in
+<A HREF="../listings-f-and-h/listings-f-and-h.txt">listings-f-and-h.txt</A>.
+
+<P>
+
+PLTP was written in 1972 and 1973.  It was
+programmed in POP-2, a now dead imperative programming language, and ran on
+an ICL 4130 processor with 64K bytes of 2 microsecond memory shared between 8
+interactive jobs controlled by teletype input from the users.  File input and
+output was by paper tape and lineprinter.
+<P>
+PLTP(A) is an applicative Common Lisp implementation of the PLTP proof
+techniques and heuristics as of 14 September, 1973.  In fact, PLTP(A) is
+coded in ACL2, a descendent of PLTP.  PLTP(A) is <I>not</I> a faithful
+translation of the 1973 code because the known
+<A HREF="../bugs/index.html">bugs and oddities</A> of PLTP's original code
+have been repaired and some of the algorithms have been implemented
+differently while preserving a high-level equivalency to the original code
+as discussed further below.
+<P>
+PLTP(A) supports the same basic Pure Lisp as PLTP did, with
+primitives <CODE>NIL</CODE>, <CODE>CAR</CODE>,
+<CODE>CDR</CODE>, <CODE>CONS</CODE>, <CODE>EQUAL</CODE> and <CODE>IF</CODE>.
+(Some versions of PLTP used the symbol <CODE>COND</CODE> instead
+of <CODE>IF</CODE>.  PLTP(A) uses <CODE>IF</CODE> internally but defines
+PLTP's 3-place <CODE>COND</CODE> to be <CODE>IF</CODE> and can optionally
+print <CODE>IF</CODE>-expressions as
+<CODE>COND</CODE>-expressions.)
+<P>
+PLTP(A) supports PLTP's abbreviation conventions of <CODE>T</CODE>
+(denoting <CODE>(CONS NIL NIL)</CODE>) and natural numbers (denoting lists
+of <CODE>NIL</CODE>).  PLTP's term representation left abbreviations in
+place.  E.g., while exploring a term the 1973 theorem prover could have encountered both the number
+<CODE>0</CODE> and its formal meaning, <CODE>NIL</CODE>.  This invited
+programming errors, as when the 1973 <CODE>EVAL</CODE>
+transformed <CODE>(CDR </CODE><I>n</I><CODE>)</CODE> to
+<I>n</I>-1, for all natural numbers <I>n</I>, because we (Boyer and Moore)
+forgot to check that <I>n</I> is not <CODE>0</CODE>, resulting in the
+transformation of
+<CODE>(CDR 0)</CODE> to the non-term <CODE>-1</CODE>.
+<P>
+In contrast, PLTP(A) translates abbreviated terms into their formal
+correspondents at input so that the core theorem prover only sees formal
+terms.  This not only makes its term exploration paradigms more regular but
+eliminates a variety of bugs and oddities such as PLTP's failure to always
+treat <CODE>T</CODE>, <CODE>1</CODE>, and <CODE>(CONS NIL NIL)</CODE> the
+same even though all three denote the same term.
+<P>
+PLTP(A) ``untranslates'' before printing so printed terms contain the
+familiar abbreviations.  This can be controlled by various ``feature switches'' set by
+the user.  See the definition of <CODE>set-feature</CODE> in the PLTP(A) source code.
+
+<P>
+POP-2's 8-character limitation on names produced many obscure names, e.g.,
+<CODE>GENRLT1</CODE>.  I have changed the names of many implementation functions, e.g.,
+<CODE>GENRLT1</CODE> is here called <CODE>generalizable-subterms</CODE> and
+<CODE>GENRLIZE</CODE> is now called <CODE>generalize</CODE>.  When the new
+name lacks obvious correspondence to the old name (as
+with <CODE>GENRLT1</CODE>), a comment in the code gives the old name.
+
+<P>
+
+PLTP(A) does not attempt to reproduce exactly PLTP's English explanations of the
+proof steps.  (The main reason for this is that it requires cluttering the
+code with output routines and for PLTP(A) I chose to make the generation of output as
+inconspicuous as possible to focus on the clarity of the term manipulation
+code.)  But PLTP(A) takes the same steps (subject to the caveats below),
+describes each step in English, and prints the same intermediate formulas
+(again, subject to caveats below).
+
+<P>
+
+No longer concerned with speed and memory footprint, I've freely recoded the
+algorithms to return the ``same'' results, often by more elegant means.  But
+by ``same'' I mean the proof steps taken by PLTP(A) are the same as those by
+the 1973 PLTP.  Every intermediate formula produced by PLTP(A) logically
+entails the corresponding formula produced by PLTP; in fact, if one allows
+for variable renaming and abbreviations, corresponding formulas are usually
+identical.  For example, where PLTP might have generated and printed
+<PRE><CODE>
+[COND [NUMBERP GENRL1] [EQUAL [LENGTH GENRL1] GENRL1] [CONS NIL NIL]]
+</CODE></PRE>
+PLTP(A) might generate and print the variant (due to variable renaming):
+<PRE><CODE>
+(COND (NUMBERP GENRL2) (EQUAL (LENGTH GENRL2) GENRL2) (CONS NIL NIL))
+</CODE></PRE>
+or one of several equivalent abbreviations for that formula depending on the feature switches:
+<PRE><CODE>
+(COND (NUMBERP GENRL2) (EQUAL (LENGTH GENRL2) GENRL2) T)
+</CODE></PRE>
+or
+<PRE><CODE>
+(IF (NUMBERP GENRL2) (EQUAL (LENGTH GENRL2) GENRL2) T)
+</CODE></PRE>
+or
+<PRE><CODE>
+(IMPLIES (NUMBERP GENRL2) (EQUAL (LENGTH GENRL2) GENRL2)).
+</CODE></PRE>See the definition
+of <CODE>set-feature</CODE> for more explanations.
+<P>
+But I wrote ``usually identical'' above!  There are two exceptions to this
+formula-by-formula identity-modulo-abbreviations: the output of PLTP(A)'s
+fertilization routine is a generalization of PLTP's, and the output of
+PLTP(A)'s induction routine is always a list-based inductive formula and
+never one tailored explicitly to Peano naturals.  We discuss these two
+discrepancies, and some minor ones, below.
+
+<P>
+
+The important deviations from the implementation used in PLTP are as follows:
+
+<UL>
+
+<LI><I>Term Representation</I>:  As previously noted, the internal form of
+terms in PLTP(A) is different:  abbreviations have been translated away.  This
+changes the case analysis of virtually every routine that explores terms &mdash; and
+eliminates several bugs.
+
+<P>
+
+<LI><I>Type information</I>: PLTP contained code to determine the ``type'' of
+an expression.  In the most general case, it actually created a new function,
+called the ``type function,'' to describe the output of a given function, <I>fn</I>.  Its
+analysis was context free (insensitive both to the hypotheses governing the
+occurrence of the call of <I>fn</I> in question and insensitive to the actuals passed to <I>fn</I>)
+and was based on the type functions of the subfunctions used in the body of <I>fn</I>.  It
+generated type functions on the fly during proofs, whenever it needed type information.
+It then stored the generated type function on the property list of <I>fn</I> for future use.
+Thus, PLTP 
+routines that required type information side-effected the logical world.
+
+<P>
+I chose not to do this in PLTP(A) because it would have meant that every
+term-processing routine in PLTP(A) that accessed type
+information would have to return two results, the new term and the (possibly)
+modified world containing updated type information.
+<P>
+Instead, every time the user introduces a function in PLTP(A), its type
+function is generated then and there and stored.  This makes the prover
+routines simpler and more valuable as pedagogical illustrations of the term
+processing techniques.
+<P>
+Because PLTP's type function generator was context free, the type functions
+generated by PLTP(A) at definition-time are the same as those PLTP generated
+at proof-time.  (The above claim of equivalence is not entirely accurate
+because of the next deviation!)
+
+<P>
+
+<LI><I>Numeric Variable Symbols</I>: PLTP, as of 14 September, 1973, provided
+the notion of numerically typed variable symbols.  Recall that in PLTP's
+logic, the naturals were constructed, Peano-like, from <CODE>NIL</CODE> by
+successively <CODE>CONS</CODE>ing <CODE>NIL</CODE> onto them.  Such lists of
+<CODE>NIL</CODE> were recognized by the predicate <CODE>NUMBERP</CODE>.
+<P>
+Variable symbols (which at the time we called
+<I>Skolem constants</I>, from our days of resolution theorem proving) whose names
+began with the letters between <CODE>I</CODE> and <CODE>N</CODE> were
+understood to be numerically valued.  Such symbols were recognized by 
+<CODE>ISNUMSKO</CODE> in the POP-2 source code for PLTP.  Theorems involving
+such numeric variables were thought of as implicitly carrying additional
+hypotheses constraining those variables to satisfy PLTP's <CODE>NUMBERP</CODE> predicate.
+<P>
+PLTP's type inference mechanism assumed any numeric variable was numerically valued.
+Furthermore, it would infer and store the output type of a defined function from its body.
+<P>
+But this meant that <I>if</I> the PLTP user defined, say, the identity function with a numeric formal, PLTP would have
+stored the type information that its output was numeric.  But PLTP did not provide any
+enforcement of the implied type system!
+<P>
+For example the PLTP user could have written
+<CODE>[DEFINE [FOO [LAMBDA [N] N]]]</CODE> and it would be typed as numeric.
+Then, using the stored type function, PLTP could have proved the invalid formula <CODE>(NUMBERP (FOO A))</CODE>.
+But nothing would prevent the PLTP user from then calling <CODE>FOO</CODE> on a
+non-number and the result would be that non-number (since <CODE>FOO</CODE>
+here is the identity function), contrary to the theorem just mentioned.
+
+<P>
+The PLTP user &mdash and there were only two! &mdash could avoid this
+unsoundness simply by never using numeric variables as formals in
+definitions.  Indeed, no definition in the standard regression suite or the
+JACM paper used numeric formals, so perhaps we recognized this problem at the
+time.  (It should be understood that PLTP was an experimental research tool
+for investigations into induction and we tolerated many such implicit
+preconditions so we could get on with the research.)
+<P>
+Numeric variables were also supported in induction: instead of proving
+<CODE>[<I>p</I> N]</CODE> with its normal simple induction scheme for lists:
+<PRE>
+[AND [<I>p</I> NIL]
+     [IMPLIES [<I>p</I> N] [<I>p</I> [CONS N1 N]]]]
+</PRE>
+PLTP used a scheme tailored to numerically typed variables:
+<PRE>
+[AND [<I>p</I> 0]
+     [IMPLIES [<I>p</I> N] [<I>p</I> [ADD1 N]]]].
+</PRE>
+<I>aka</I>
+<PRE>
+[AND [<I>p</I> NIL]
+     [IMPLIES [<I>p</I> N] [<I>p</I> [CONS NIL N]]]].
+</PRE>
+<P>
+In creating PLTP(A), I therefore had the choice of either (a) enforcing a
+type system or (b) removing the whole notion of numeric variables.  I chose the latter.
+PLTP(A) does <I>not</I> treat variables starting with the
+letters <CODE>I</CODE> through <CODE>N</CODE> any differently than other
+variables and it never does a numeric induction.
+<P>
+Theorems in the two PLTP(A) provealls that contained numeric variables have been
+modified here to carry explicit <CODE>NUMBERP</CODE> hypotheses.
+
+<P>
+
+<LI><I>Evaluation and Induction</I>: PLTP's <CODE>EVAL</CODE> used side
+effects and about a dozen global variables to accumulate information to be
+used by the induction heuristic, including a so-called ``bomb list'' for each
+unexpanded recursive function call recording ``why'' that call could not be
+expanded.  When PLTP needed to symbolically evaluate a term, it
+called <CODE>EVAL</CODE> and ignored the side-effected globals; when PLTP
+needed to induct, it called <CODE>EVAL</CODE> and ignored the result but
+inspected the final value of the global <CODE>ANALYSIS</CODE> which contained
+the bomb lists.
+<P>
+As with the code for type inference, mimicking this behavior in ACL2's
+functional setting would have produced hard-to-comprehend code
+because PLTP(A)'s functional <CODE>eval</CODE> would have to return both the simplified term and a
+modified list of global variables.
+<P>
+Instead, I split PLTP's <CODE>EVAL</CODE> into two ACL2 functions, one for computing the result and another
+for computing the side-effects.
+The PLTP(A) <CODE>eval</CODE> does not accumulate anything on the side, making it easier to see how
+PLTP did symbolic evaluation.
+<P>
+Then, to implement induction in PLTP(A), I re-construct the value of
+PLTP's <CODE>ANALYSIS</CODE>, with a separate function,
+called <CODE>induction-analysis</CODE>.  <CODE>Induction-analysis</CODE> makes it
+clear what information induction uses.
+
+<P>
+While the 1973 PLTP implementation makes it obvious that induction is driven by
+the ``failures'' of the symbolic evaluator, PLTP(A)'s implementation makes it
+easier to understand how symbolic evaluation works and what information
+induction uses.
+
+<P>
+
+<LI><I>Fertilization</I>: ``Fertilization'' was introduced in PLTP and
+describes the idea of using an equality induction hypothesis by selective
+substitution <I>and then throwing the hypothesis away</I>.  However, in an
+effort to have our cake and eat it too, PLTP did not actually throw the
+hypothesis away: it merely hid it.  It hid it by introducing a new function
+symbol of no arguments that was ``defined'' to be the negation of the
+equality and then disjoining a call of that new function to the formula
+resulting from throwing away the equality.  This meant the output of the
+fertilization routine was equivalent to the input, which in turn meant that
+fertilization could freely recur root-and-branch through a formula fertilizing at will.
+
+<P>
+
+The problem with this approach is that it is that these new functions are not
+proper definitions: their bodies involve variables not among their formals.
+And if one extended the idea by adding those variables as formals to the new
+symbols, they would block the subsequent inductions that PLTP did.
+
+<P>
+PLTP(A) avoids the on-the-fly introduction of dubious definitions by deleting
+the equality after using it, which generalizes the formula.  This is what
+NQTHM and ACL2 do.  But this means that PLTP(A) cannot recur freely through
+the formula looking for equalities to use.  It only fertilizes conjuncts of
+the top-level goal.
+
+<P>
+No published proof by PLTP required any
+other form of fertilization.
+
+<P>
+
+<LI><I>New Variable Names</I>: As noted in <A HREF="../bugs/index.html">bugs
+and oddities</A> PLTP made certain implicit assumptions on user input that
+made it easier to generate ``new'' variable names by just taking on
+successively higher suffixes.  While these implicit assumptions are never violated
+in the known regression runs, I chose to eliminate that implicit assumption in PLTP(A)
+and to generate variable names that are guaranteed to be new.  This means PLTP(A)
+sometimes generates different variable names than PLTP did.
+For example, in the proof of <CODE>[T 1 4]</CODE> (page 10 of <A HREF="../scanned-images/Listing-J-OCR.pdf">Listing J</A>)
+we see PLTP generating the name <CODE>GENRL1</CODE> the first time it generalizes and then
+generating <CODE>GENRL2</CODE> and <CODE>GENRL3</CODE> the second time.  But when PLTP(A) is given the
+same conjecture to prove, it generates <CODE>GENRL1</CODE> the first time it generalizes and
+<CODE>GENRL1</CODE> and <CODE>GENRL2</CODE> the second time <I>because the
+previously generated <CODE>GENRL1</CODE> no longer appears in the conjecture
+and so can be reused</I>.  While this discrepancy could be avoided, doing so
+needlessly complicates the name generation algorithm because it would require
+passing around the history of the proof attempt, not just the current goal.
+
+<P>
+
+<LI><I>Maximal Common Subterms</I>: PLTP used fairly messy code to find the largest
+common subterms on opposites sides of equalities and implications; PLTP(A),
+on the other hand, just computes all the subterms of the two sides,
+intersects them, and then throws out any subterm contained in another.
+Whether this algorithm returns the list in the same order &mdash; or even whether
+the original algorithm really returned the alleged list of ``largest common
+subterms'' &mdash; is irrelevant here: PLTP(A)'s algorithm returns a list of the
+largest common subterms, its correctness is obvious, speed is irrelevant
+given the small problem size and today's resources, and the order of the
+subterms shouldn't matter because all of them are then generalized to new
+variables.  If the subterms are listed in a different order then that will
+affect the names of the new variables assigned to each, giving rise to the
+``variable renaming'' caveat above.  But that shouldn't affect the proofs.
+
+<P>
+
+<LI><I>The ``Waterfall''</I>: I refactored PLTP's main proof
+routine, <CODE>PROVE1</CODE> to better expose what became <I>the
+waterfall</I> in our subsequent provers.
+<P>
+PLTP's <CODE>PROVE1</CODE> explicitly
+called <CODE>EVALUATE</CODE> (which is just <CODE>EVAL</CODE> after initializing the
+globals used to accumulate induction analysis), <CODE>REWRITE</CODE>, and
+<CODE>REDUCE</CODE> successively and looped until the result stablized.  While this
+process was called ``normalation'' in the 14 September, 1973, PLTP, in
+subsequent versions of PLTP and our other provers the comparable process was called <I>simplification</I>.
+<P>
+Once the formula was simplified, PLTP called a routine that Boyer and I
+facetiously named <CODE>ARTIFINTEL</CODE> (for ``artificial intelligence''
+because according to a comment in the POP-2 code it was <CODE>THE SMARTEST
+PROGRAM IN THE THEOREM PROVER</CODE> because it only works on the first
+conjunct).  <CODE>ARTIFINTEL</CODE> fertilized, generalized, and inducted on
+the first conjunct in the formula it was given.  PLTP did not support
+elimination of destructors or of irrelevance, which were introduced later.
+<P>
+In PLTP(A), I wrap
+the <CODE>EVALUATE</CODE>/<CODE>REWRITE</CODE>/<CODE>REDUCE</CODE> loop up
+into a single function named <CODE>simplify</CODE>, and I just
+open-code <CODE>ARTIFINTEL</CODE>
+so <CODE>fertilize</CODE>, <CODE>generalize</CODE>, and <CODE>induct</CODE>
+are called explicitly by <CODE>prove1</CODE>.
+<P>
+PLTP(A) preserves PLTP's use of a single formula to represent the problem.
+For example, if simplification splits the problem into two subgoals, the
+result is an <CODE>IF</CODE>-expression representing their conjunction and
+fertilize, etc., just work on one conjunct at a time.  It wasn't until NQTHM
+that Boyer and I started splitting out goals as clauses collected and
+implicitly conjoined in the <I>pool</I> at the bottom of the waterfall.
+<P>
+
+</UL>
+
+In PLTP's defense (not to mention that of Boyer and me!) I should note that
+the resource limitations of the 1970's ICL 4130 and the POP-2 compiler
+probably drove many of our implementation choices and coding style.  It
+wasn't until 1989 and ACL2 that we adopted the much cleaner functional
+programming style.  And that style alone does not guarantee clarity.  Indeed,
+ACL2 today contains many less-than-elegant functional algorithms because
+performance still often demands code optimization despite the enormous
+improvement in processor speeds and memory sizes because applications have
+grown so much larger.  Indeed, ACL2 supports functions that return a vector
+of values so that in one sweep of a huge formula many things can be
+accumulated.
+
+<P>
+The small sizes of the definitions and conjectures presented to PLTP was
+wonderfully freeing given today's resources!
+
+<P>
+The changes in implementation also reflect lessons learned from 45 years of
+coding provers together with the much more robust ACL2 programming
+environment I enjoy today.
+<P>
+
+<H2>Running PLTP(A)</H2>
+<A NAME="RunningPLTPA">
+
+PLTP(A) was added to ACL2's Community Books Repository in March, 2018.  So if
+you have a recent ACL2 installation, you already have PLTP(A).  Below we tell
+you how to run it.  After that we give a brief summary of the interesting
+files you'll find on the <CODE>books/projects/pltpa/</CODE> subdirectory of
+your ACL2 directory, and finally we tell you how to get ACL2 if you don't
+have it.
+
+<P>
+To play with PLTP(A), do
+
+<PRE>
+(include-book "projects/pltpa/pltpa" :dir :system)
+</PRE>
+
+and then select the PLTP symbol package and initialize the PLTP(A) logical world with
+
+<PRE>
+(pltpa)
+</PRE>
+
+Then you can define PLTP functions and submit challenge theorems as with
+
+<PRE>
+(define (append ; define a PLTP function
+	 (lambda (x y)
+	   (if x (cons (car x) (append (cdr x) y)) y))))
+
+(prove assoc-of-append ; name is irrelevant except for io; theorems are not
+                       ; stored in the PLTP world
+
+       (equal (append (append a b) c)
+              (append a (append b c))))
+</PRE>
+For a complete list of available commands, e.g., to inspect PLTP's database,
+or undo a definition, see the comment at the top of the
+<A HREF="https://raw.githubusercontent.com/acl2/acl2/master/books/projects/pltpa/pltpa.lisp">PLTP(A)
+source file</A>, which may be found
+in <CODE>"books/projects/pltpa/pltpa.lisp"</CODE> of your local ACL2
+installation.
+<P>
+You can find all of the PLTP(A) files on the <CODE>books/projects/pltpa/</CODE>
+subdirectory of your ACL2 directory.
+
+<P>
+Among the interesting files after certification of the books there you will find:
+<UL>
+<LI><CODE>pltpa.lisp</CODE> &mdash; the source file for PLTP(A)
+<LI><CODE>pltpa.acl2</CODE> &mdash; the definition of the PLTP symbol package
+<LI><CODE>standard-proveall.lsp</CODE> &mdash; the PLTP(A) commands in its standard proveall regression suite
+<LI><CODE>chk-standard-proveall.lisp</CODE> &mdash; an ACL2 book that is certifiable iff PLTP(A) passes the standard proveall
+<LI><CODE>chk-standard-proveall.cert.out</CODE> &mdash; PLTP(A)'s output on the standard proveall (see note below)
+<LI><CODE>jacm-proveall.lsp</CODE> &mdash; the PLTP(A) commands in its JACM proveall regression suite
+<LI><CODE>chk-jacm-proveall.lisp</CODE> &mdash; an ACL2 book that is certifiable iff PLTP(A) passes the JACM proveall
+<LI><CODE>chk-jacm-proveall.cert.out</CODE> &mdash; PLTP(A)'s output on the JACM proveall (see note below)
+</UL>
+
+Note on how to read the <CODE>.cert.out</CODE> files above: Ordinarily, an
+ACL2 book can be certified provided the ACL2 prover can successfully prove
+every theorem in it.  So how do we make a book that ACL2 can certify iff
+PLTP(A) can prove the theorems in its own regression?  That involves a
+certain amount of infrastructure.  The two <CODE>.cert.out</CODE> files above
+contain the output of ACL2's certification process.  That output starts and
+ends with ``noise'' related to ACL2's certification infrastructure.
+PLTP(A)'s output (e.g., on its standard proveall) may be found between the
+block of text that starts with
+
+<PRE>
+:STANDARD Proveall by PLTP(A)
+</PRE>
+and the block that starts with
+<PRE>
+Successful :STANDARD Proveall by PLTP(A) completed on
+</PRE>
+
+Of course, if you have a running PLTP(A) you can see the output of the
+provealls by evaluating <CODE>(proveall :standard)</CODE> and <CODE>(proveall
+:jacm)</CODE>.
+
+
+<P>
+If you do not already have ACL2 then you must obtain and install it in order
+to run PLTP(A).  This also involves installing one of several available
+Common Lisp implementations.  Follow the installation instructions under
+the <I>Obtaining, Installing, and License</I> link on the
+<A HREF="http://www.cs.utexas.edu/users/moore/acl2">ACL2 Home Page</A>.
+<P>
+The <I>Easy Install for Unix-like Systems</I> instructions will fetch not
+only the ACL2 system source code but also all of the Community Books.  It is
+easier to fetch them all than to fetch just what you need for PLTP(A).  But
+because PLTP(A) does not depend on any other books, you can skip the general
+certification instructions (e.g., Step 5 of the <I>Easy Install for Unix-like
+Systems</I>) if all you want to do is play with PLTP(A).  Instead, just build your
+<CODE>saved_acl2</CODE> runnable image and then certify the PLTP(A) books by
+connecting to <CODE>books/projects/pltpa</CODE> in your local ACL2
+installation and running:
+<PRE>
+../../build/cert.pl --acl2 ../../../saved_acl2 *.lisp
+</PRE>
+
+
+</HTML>

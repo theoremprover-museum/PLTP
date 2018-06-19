@@ -1,0 +1,636 @@
+<HTML>
+<HEAD>
+<TITLE>The PLTP Archive</TITLE>
+</HEAD>
+<BODY TEXT="#000000" 
+      BGCOLOR="FFFFFF"
+      LINK ="#FF0000"
+      VLINK="#A020F0" 
+      ALINK="#FFD700"
+      "fixed">
+
+<CENTER>
+<H1>The PLTP Archive</H1>
+<BR>
+J Strother Moore
+<BR>
+<BR>
+<I>reporting joint work with</I>
+<BR>
+Robert S. Boyer
+<BR>
+<I>and with contributions by</I>
+<BR>
+Grant O. Passmore
+<BR>
+March, 2018
+</CENTER>
+
+<H2>Abstract</H2>
+
+<P>
+The first general-purpose automatic theorem prover explicitly designed for
+the mathematics behind program verification was
+the <I>Edinburgh Pure Lisp Theorem Prover</I> otherwise known as
+<I>PLTP</I>.  PLTP was created in 1972 and 1973 by Boyer and me while we were
+in the Department of Computational Logic (formerly, the Metamathematics
+Unit), School of Artificial Intelligence, University of Edinburgh, Scotland.
+It was a direct response to the inadequacies of the then-popular
+resolution-based first-order provers (upon which we had been working) for
+program verification purposes.
+The <A HREF="#AnnotatedBibliography">Annotated Bibliography</A> below
+provides scanned images of the 1973 POP-2 code for PLTP, its input, and its
+output, as well as links to other relevant material including POP-2 reference
+manuals, my dissertation, and articles about PLTP published in 1973 and 1975.
+In addition, we provide two modern (2017) recreations of PLTP, one in ACL2
+and the other in OCaml.  But first I would like to describe the origins of
+PLTP and of this archive.
+
+<H2>Edinburgh, 1972 &mdash; 1973</H2>
+
+
+Boyer and I met in Edinburgh in September, 1971.  Initially we worked
+together on resolution provers, specifically Bob Kowalski's SL-resolution and
+structure sharing in both linear and general resolution.  This led us to
+explore the creation of a precursor to Prolog called <I>Baroque</I> which
+allowed one to use SL-resolution to interpret programs and to prove theorems
+about them (see page 70 of Moore's dissertation).  We then moved from Baroque
+to a Lisp subset implemented in Baroque (see page 75 op. cit.).  See Part I of
+my dissertation below for a report on the first year of our collaboration.
+(See the <A HREF="#AnnotatedBibliography">Annotated Bibliography</A> below
+for proper citations.)
+<P>
+For example,
+we could prove that there exists an <CODE>X</CODE> such that the recursively defined
+<CODE>(LENGTH X)</CODE> is equal to <CODE>3</CODE>.  But we could not prove
+that <CODE>(LENGTH (APPEND X Y))</CODE> is <CODE>(+ (LENGTH X) (LENGTH Y))</CODE>.
+The latter conjecture requires <I>mathematical induction</I>.
+
+<P>
+Our focus on proving properties of programs as a test bed for our efforts in
+resolution led us by 1972 to the realization that we needed to build a prover
+capable of induction.
+
+
+<P>
+
+The standard approach to program verification in the early 1970s was to (a)
+annotate a program with assertions, (b) use one of several methods to
+generate ``verification condition'' formulas, and then (c) use an <I>ad
+hoc</I> simplifier or resolution theorem prover to attempt to prove those
+formulas.  It was not uncommon for researchers of the day to add additional
+``lemmas'' or specially tailored ``axioms'' to the set of input assumptions
+in order for the prover to succeed.
+
+<P>
+
+The reason for this, as we pointed out in the Preface of our 1979 book
+<I>A Computational Logic</I> (Academic Press):
+
+<BLOCKQUOTE>
+One reason that researchers have had to assume ``lemmas'' so freely is that
+they have not implemented the principle of mathematical induction in their
+theorem-proving systems.  Since mathematical induction is a fundamental rule
+of inference for the objects about which computer programmers think (e.g.,
+integers, sequences, trees), it is surprising that anyone would implement a
+theorem-prover for program verification that could not make inductive
+arguments.
+</BLOCKQUOTE>
+
+We speculated on the possibility that researchers (unconsciously) assumed
+that the only roles for induction was to unwind loops and handle procedure
+calls &mdash; roles fulfilled by the program semantics.  But regardless of
+why, it is a fact induction was not supported even though many verification
+conditions involved properties of inductively constructed objects.
+
+<P>
+
+Thus 1972 found us proving theorems about recursive list processing
+functions, by hand on the blackboard, and discussing the techniques and
+heuristics we were using.  The main questions were
+<UL>
+<LI>When did we decide to use
+induction?
+<LI>How did we decide what to induct upon?
+<LI>How did we formulate the induction hypotheses?
+<LI>How did we simplify the
+induction conclusions so we could appeal to the induction hypotheses?
+</UL>
+
+<P>
+These exercises soon led us to implement our methods in the Edinburgh Pure
+Lisp Theorem Prover, PLTP.  Briefly put, PLTP was a fully automatic theorem
+prover for properties of recursive functions over list structures.  Since our
+focus was on induction, we limited the language to a homegrown version of
+Pure Lisp supporting just the object
+<CODE>NIL</CODE> and ordered pairs constructed by <CODE>CONS</CODE>.  The
+language included <CODE>CAR</CODE> and <CODE>CDR</CODE>, a
+3-place <CODE>IF</CODE> (actually named ``<CODE>COND</CODE>'' in early work),
+and <CODE>EQUAL</CODE>.  Natural numbers were just abbreviations for lists
+of <CODE>NIL</CODE>s giving rise to Peano-like definitions of arithmetic.
+The user could define recursive functions and challenge the prover to prove
+properties.  It was not possible for the user to offer hints, lemmas, or
+other help.
+
+<P>
+In this setting we could explore automatic proofs of the most elementary
+results of elementary number theory as well as properties sequences and trees
+and of functions that mixed those theories, e.g., we could pursue the kinds
+of proofs required by program verification.
+
+<P>
+Roughly speaking, PLTP took an input formula (as a term)
+and <I>simplified</I> it by repeatedly applying ``symbolic evaluation''
+(see <CODE>EVALUATE</CODE> in
+<A HREF="listings-f-and-h/index.html">listings-f-and-h</A>), ``rewriting''
+(see <CODE>REWRITE</CODE>) and ``reduction'' (see <CODE>REDUCE</CODE>) until
+it no longer changed.  After
+simplification, PLTP applied ``fertilization'' (see <CODE>FERTILIZE</CODE>),
+``generalization'' (see <CODE>GENRLIZE</CODE>), and induction (see <CODE>INDUCT</CODE>).
+Fertilization replaced one side of an equality induction hypothesis by the
+other in certain occurrences in the induction conclusion and ``discarded''
+the hypothesis.  Generalization replaced some terms by new variables,
+possibly restricting the values of the new variables to satisfy certain automatically synthesized
+``type functions.''  Finally, selection of an induction schema was driven by
+the failures of symbolic evaluation to expand calls of recursive functions in
+the conjecture.
+
+<P>
+We structured the 1973 PLTP somewhat differently than our subsequent NQTHM
+and ACL2 provers.  Let me digress to point out some design choices that
+readers familiar with our more recent provers may find surprising.
+<UL>
+<P>
+<LI>PLTP did not operate on clauses but on terms typically representing conjunctions held together by
+<CODE>IF</CODE>s.  That is, all of the subgoals of a proof were expressed in a single term.  We didn't introduce
+clauses, the ``waterfall,'' and the ``pool'' until the prover described in <I>A Computational Logic</I> (Academic Press, 1979).
+
+<P>
+<LI>The PLTP process of repeatedly
+applying <CODE>EVALUATE</CODE>, <CODE>REWRITE</CODE>, and <CODE>REDUCE</CODE>
+until the result was stable was called by the non-word ``normalation'' in the
+early copies of Moore's dissertation and in the 14 September, 1973, source
+code (see the definition of <CODE>NORMALATE</CODE> on page 14
+of <A HREF="scanned-images/Listing-F-OCR.pdf">Listing-F</A>).  However,
+Moore's PhD examining committee (Bernard Meltzer, Rod Burstall, Robin Milner,
+and David Cooper) asked us to name the process with an English word.  We
+chose ``simplification'' and we defined the function <CODE>SIMPLIFY</CODE> in
+subsequent versions of PLTP.  See, for example, page 18
+of <A HREF="scanned-images/Listing-A-OCR.pdf">Listing-A</A>, printed 2
+November, 1973.
+
+<P>
+<LI>Unlike NQTHM and ACL2, PLTP's simplifier had no provision for
+user-suggested lemmas.  PLTP heuristically expanded calls of defined
+functions (using some of the same heuristics used today) and applied rewrite
+rules about the six primitives, e.g.,
+<PRE>
+(CAR (CONS X Y)) = X
+
+(IF X Y Y) = Y
+</PRE>
+But there was no way to store or use rules derived from previously proved theorems.
+
+<P>
+<LI>In PLTP, symbolic evaluation (<CODE>EVALUATE</CODE>) used side-effects to
+maintain a group of global and locally-bound ``special'' variables to be used
+by induction.  The main such variable was named <CODE>ANALYSIS</CODE> and it
+accumulated ``bomb lists'' recording recursive calls that blocked the
+symbolic expansion of recursive functions.  <CODE>ANALYSIS</CODE> was
+accessed during induction processing by <CODE>PICKINDVARS</CODE>.
+  
+<P>
+<LI>PLTP could only do structural induction.  For example (using POP-2's
+square bracket notation for s-expressions), PLTP's inductive argument to prove
+<CODE>[<I>p</I> X]</CODE> when <CODE>X</CODE> is a linear list was:
+<PRE>
+[AND [<I>p</I> NIL]
+     [IMPLIES [<I>p</I> X] [<I>p</I> [CONS X1 X]]]]
+</PRE>
+Our subsequent provers used a schema like this for linear lists:
+<PRE>
+(AND (IMPLIES (NOT (CONSP X)) (<I>p</I> X))
+     (IMPLIES (AND (CONSP X)
+                   (<I>p</I> (CDR X)))
+              (<I>p</I> X)))
+</PRE>
+Obvious generalizations of this latter scheme allow one to provide induction
+hypotheses about arbitrary objects smaller than <CODE>X</CODE>, not just
+explicit structural components of <CODE>X</CODE>.
+
+<P>
+<LI>Finally, PLTP collected fertilization, generalization, and induction into
+a routine that was facetiously given the name <CODE>ARTIFINTEL</CODE> (for
+``artificial intelligence'') because:
+
+<PRE>
+COMMENT 'THIS FUNCTION APPLIES FERTILIZATION AND IF THAT FAILS
+TRIES GENERALIZING AND INDUCTING.  IT IS CAREFUL TO WORK ONLY
+ON THE FIRST CONJUNCT IF THE THEOREM IS A CONJUNCT.  FOR THIS
+IT GETS THE NAME "ARTIFICIAL INTELLIGENCE", BEING ABOUT THE
+SMARTEST PROGRAM IN THE THEOREM PROVER.`;
+</PRE>
+
+In our subsequent provers, in which the goal was represented by the implicit
+conjunction of clauses in the pool, we generalized this architecture and
+collected simplification, fertilization, generalization, and (eventually
+other processes like destructor elimination and irrelevance elimination) into
+the waterfall with induction at the bottom.  Since PLTP's
+<CODE>ARTIFINTEL</CODE> focused generalization and induction on the first
+conjunct, PLTP acted as though it had a pool and (small) waterfall.  Unlike
+our subsequent provers, PLTP eagerly simplified and fertilized all the
+formulas in the pool before resorting to generalization, etc.
+
+</UL>
+
+<P>
+1973 was a very active time and many different experimental versions of the
+system were tried, mostly involving minor tweaks to heuristics.  To maintain
+our sanity we had a regression suite of function definitions and theorems,
+called <I>the proveall</I>, and ran the modified code on the proveall every
+time we changed the system.
+
+<P>
+
+By the end of 1973 we had a reasonably large corpus of Pure Lisp definitions
+and properties in our proveall regression suite.  Among the properties proved
+fully automatically were that list concatenation is associative, reverse is
+its own inverse, and insertion sort is correct.  The last was stated as two
+theorems, that insertion sort produces ordered output and that, for
+all <I>x</I>, the number of times <I>x</I> occurs in the input is equal to
+the number of times <I>x</I> occurs in the output.  Images of lineprinter
+listings of PLTP's proveall and the proof output are included in the
+bibliography below.  (By the way, the second half of the correctness of
+insertion sort &mdash; the part about <CODE>SORT</CODE> preserving the number
+of occurrences &mdash; is not proved in the 18 July, 1973 proveall listing we
+have, indeed it is marked with a <CODE>*</CODE> in the input, indicating that
+it was a challenge we were working on.  It is listed among the successful
+theorems in the dissertation some months later.)
+<P>
+Here for example is 1973 PLTP proof that <CODE>SORT</CODE>
+produced <CODE>ORDERED</CODE> output.
+The HTML text below was manually transcribed from pages 127-130 of the
+<A HREF="scanned-images/Listing-J-OCR.pdf">proveall output of 18 July,
+1973</A>.  I may have inadventently introduced typos.  I have deleted some
+blank lines.
+
+<P>
+Definitions of non-primitives used in the proof were printed at the end of
+the proof log.  Note than <CODE>IMPLIES</CODE> and <CODE>AND</CODE> were
+non-primitives: our logical connector was the 3-place <CODE>COND</CODE>
+(subsequently renamed <CODE>IF</CODE>).  <CODE>ADDTOLIS</CODE> is the
+user-defined insertion function used by
+<CODE>SORT</CODE>; <CODE>LTE</CODE> is the user-defined Peano ``&le;''
+operator.  The proof below shows PLTP doing two generalizations and three
+inductions &mdash; a straightforward induction on a linear list, a
+``special'' induction with two base cases, and an induction on two variables
+simultaneously.  The proof shows PLTP ``discovering'' the lemmas that
+insertion preserves orderedness and that
+<I>i &le; j</I> or <I>j &le; i</I>.
+
+
+
+  
+
+<PRE>
+[T 6 8]  [ 16.22 18 JULY 1973]
+
+THEOREM TO BE PROVED:
+[ORDERED [SORT A]]
+
+MUST TRY INDUCTION.
+
+INDUCT ON A.
+
+THE THEOREM TO BE PROVED IS NOW:
+[AND [ORDERED [SORT NIL]]
+     [IMPLIES [ORDERED [SORT A]] [ORDERED [SORT [CONS A1 A]]]]]
+
+WHICH IS EQUIVALENT TO:
+[COND [ORDERED [SORT A]] [ORDERED [ADDTOLIS A1 [SORT A]]] T]
+
+GENERALIZE COMMON SUBTERMS BY REPLACING [SORT A] BY GENRL1.
+
+THE GENERALIZED TERM IS:
+[COND [ORDERED GENRL1] [ORDERED [ADDTOLIS A1 GENRL1]] T]
+
+MUST TRY INDUCTION.
+
+(SPECIAL CASE REQUIRED)
+
+INDUCT ON GENRL1.
+
+THE THEOREM TO BE PROVED IS NOW:
+[AND
+ [COND [ORDERED NIL] [ORDERED [ADDTOLIS A1 NIL]] T]
+ [AND
+    [COND [ORDERED [CONS GENRL11 NIL]]
+    .     [ORDERED [ADDTOLIS A1 [CONS GENRL11 NIL]]]
+    .     T]
+    [IMPLIES [COND [ORDERED [CONS GENRL12 GENRL1]]
+                   [ORDERED [ADDTOLIS A1 [CONS GENRL12 GENRL1]]]
+                   T]
+             [COND [ORDERED [CONS GENRL11 [CONS GENRL12 GENRL1]]]
+                   [ORDERED [ADDTOLIS A1 [CONS GENRL11 [CONS GENRL12 GENRL1]]]]
+                   T]]]]
+
+WHICH IS EQUIVALENT TO:
+
+[COND [LTE A1 GENRL11] T [LTE GENRL11 A1]]
+
+MUST TRY INDUCTION.
+
+INDUCT ON GENRL11 AND A1.
+
+THE THEOREM TO BE PROVED IS NOW:
+[AND [AND [COND [LTE A1 NIL] T [LTE NIL A1]]
+          [COND [LTE NIL GENRL11] T [LTE GENRL11 NIL]]]
+     [IMPLIES [COND [LTE A1 GENRL11] T [LTE GENRL11 A1]]
+              [COND [LTE [CONS A11 A1] [CONS GENRL111 GENRL11]]
+                    T
+                    [LTE [CONS GENRL111 GENRL11] [CONS A11 A1]]]]]
+
+WHICH IS EQUIVALENT TO:
+T
+
+FUNCTION DEFINITIONS:
+[SORT [LAMBDA [X] [COND X [ADDTOLIS [CAR X] [SORT [CDR X]]] NIL]]]
+
+[ORDERED
+ [LAMBDA
+  [X]
+  [COND
+      X
+      [COND [CDR X] [COND [LTE [CAR X] [CAR [CDR X]]] [ORDERED [CDR X]] NIL] T]
+      T]]]
+
+[LTE [LAMBDA [X Y] [COND X [COND Y [LTE [CDR X] [CDR Y]] NIL] T]]]
+
+[ADDTOLIS
+ [LAMBDA
+    [X Y]
+    [COND Y
+          [COND [LTE X [CAR Y]] [CONS X Y] [CONS [CAR Y] [ADDTOLIS X [CDR Y]]]]
+          [CONS X NIL]]]]
+
+[IMPLIES [LAMBDA [X Y] [COND X [COND Y T NIL] T]]]
+
+[AND [LAMBDA [X Y] [COND X [COND Y T NIL] NIL]]]
+
+GENERALIZATIONS:
+GENRL1 = [SORT A]
+
+PROFILE: [/ [A] , / E N R / E N R G S1 [GENRL1] , / E N R / E N R / E N R / E N
+R / E N R [GENRL11 A1] , / E N R / E N R .]
+
+TIME: 57.06 SECS.
+</PRE>
+
+<P>
+Our choice of Pure Lisp as the logic in which to conduct our proofs was
+inspired by John
+McCarthy's <A HREF="https://dl.acm.org/citation.cfm?id=1460715">A Basis for a
+Mathematical Theory of Computation</A>.  Indeed, we were so enamored with the
+idea of LISP as a logic that PLTP used <CODE>IF</CODE> to represent the
+conjunction of subgoals.  The style in which we organized PLTP was inspired
+by similar provers by Bob Boyer's dissertation advisor, W. W. Bledsoe.
+
+<P>
+We
+implemented PLTP in POP-2, a imperative Lisp-like programming language with
+an Algol-like syntax developed at the University of Edinburgh by Robin
+Popplestone and Rod Burstall.  POP-2 was the language supported by the
+computing platform available to us in 1973: an ICL 4130 processor with 64K
+bytes of 2 microsecond memory shared between 8 interactive jobs controlled by
+teletype input from the users. File input and output was by paper tape and
+lineprinter.  The modern reader may have a hard time imagining theorem proving
+research conducted under such constraints!
+
+<P>
+We regarded PLTP as an experimental vehicle for exploring inductive proofs.
+We were the only users and our computing resources were extremely limited.
+We therefore took many shortcuts that we abandoned as our subsequent provers
+attracted other users and computing resources grew exponentially.  The most
+egregious shortcut was that the prover did not check that the s-expression
+provided as input was well-formed.  It was just implicit that we'd call the
+prover only on formulas!  There were many such implicit understandings, e.g.,
+no definitional principle was implemented, some variable symbols were
+implicitly reserved for introduction by the prover, variable symbols
+beginning with the letters <CODE>I</CODE> through <CODE>N</CODE> were
+implicitly treated as numeric, etc.  In addition, we inevitably made coding
+mistakes, some of which we found and fixed and others of which apparently
+escaped our notice until we assembled this archive!  We include a discussion
+of all ``bugs'' discovered in the 14 September, 1973, listings below.
+Importantly in this regard, our whole understanding of what constituted a
+``bug'' in a theorem prover has evolved in the 45 years from PLTP's origin as
+a experimental system used by two people to the adoption of theorem provers
+and proof assistants as trusted industrial tools.
+
+<P>
+A brief paper about PLTP, <I>Proving Theorems about LISP Functions</I> was
+presented at the <I>Third International Joint Conference on Artificial
+Intelligence</I> (IJCAI-73), 20-23 August 1973, at Stanford University.  A
+longer version of the paper, with the same title, subsequently appeared in
+the <I>JACM</I> in 1975.  Proper citations are given below.
+
+<P>
+PLTP was the beginning of a sequence of Boyer-Moore-Kaufmann provers for
+applicative Lisp: the unnamed prover described in <I>A Computational
+Logic</I>, Boyer and Moore, Academic Press, 1979, as well
+as <A HREF="ftp://ftp.cs.utexas.edu/pub/boyer/nqthm/index.html">NQTHM</A>
+and <A HREF="http://www.cs.utexas.edu/users/moore/acl2">ACL2</A>.
+
+<P>
+PLTP itself passed into history.
+
+<H2>Reconstructions of PLTP</H2> 
+
+Around 2014, Grant Passmore emailed Boyer and Moore that he had implemented
+PLTP in OCaml working entirely from Moore's dissertation and the 1975 JACM
+paper.  Passmore's interest was primarily driven by a desire to understand
+our induction heuristics so that he could implement induction in
+the <A HREF="https://www.imandra.ai/">Imandra theorem prover</A> of Aesthetic
+Integration, Ltd.  Grant has kindly permitted us to link to his OCaml
+implementation of PLTP, which we call PLTP(O), below.
+
+<P>
+
+In the spring of 2017, while looking through old boxes of papers (trying to
+find the documentation for
+the <A HREF="http://www.cs.utexas.edu/users/moore/publications/77-Editor-Users-Manual-OCR.pdf">77
+Editor</A> for which Boyer and I invented the notion of ``piece table'' used
+by Charles Simonyi in the Xerox PARC text editor Bravo and subsequently in
+Microsoft Word) we found a complete listing of the source code for PLTP as of
+14 September, 1973.  We also found various 5-hole paper tapes purporting to
+contain various files from the era.  But absent a 5-hole paper tape reader,
+our only readable record of PLTP's source code are the faded lineprinter
+listings from 1973.  These include many versions of various component files
+and one complete listing of all relevant POP-2 source code files for PLTP
+made on 14 September, 1973.  That listing was labeled in 1973 with the
+handwritten note ``the theorem prover as reported in J's thesis.''
+
+<P>
+
+We also found lineprinter listings of the proveall and the proveall output of
+a version of PLTP predating the dissertation by a couple of months.
+
+<P>
+
+In the summer of 2017, working directly from the original POP-2 sources I
+recoded PLTP in <A HREF="http://www.cs.utexas.edu/users/moore/acl2">ACL2</A>.
+However, I took certain liberties: I corrected certain bugs I discovered and
+refactored some subroutines for clarity without (intentionally) changing
+their behavior.  While any computation can be mimicked in any Turing complete
+programming language like ACL2, I simply (gratuitously?) balked at trying to
+mimic exactly the methods of some PLTP routines &mdash; memory limitations of
+the 1970s drove us to short-cuts, convoluted coding style, the use of
+numerous side-effects to global variables and data structures, and use of the
+peculiar feature of POP-2 in which one could ``surreptitiously'' pass
+arguments to future subroutine calls by leaving ``extra'' results on a stack.
+
+<P>
+
+In my reconstruction I tended to use more straightforward functional
+programming idioms, like defining one ACL2 function to compute the results of
+a given POP-2 routine and another ACL2 function to compute the side-effects.
+All of this &mdash; including the bugs discovered and the ``gratuitous''
+stylistic changes &mdash; is documented below in great detail.
+
+<P>
+
+We call the resulting prover
+<I>PLTP(A)</I>.  PLTP(A) focuses on what we call the <I>September core</I>:
+the proof methods implemented as of 14 September, 1973.  It ignores
+extraneous issues like the command one would have invoked in 1973 to run the
+regression suite, the code to reproduce exactly the way we prettyprinted
+formulas in 1973 and the English proof narrative produced by PLTP.  I then
+``successfully'' ran the 1973 regression with PLTP(A).  I quote
+``successfully'' because two theorems failed, but I argue in the PLTP(A)
+material below that PLTP could not have proved these theorems and they were
+in the suite as challenges to work on.
+
+<P>
+
+We also undertook an ultimately unsuccessful effort to get the original POP-2
+sources for PLTP to run on a modern machine.  While no modern implementation
+of POP-2 exists (as far as we're aware) Passmore found a binary image for a
+Russian BESM-6 computer booted with a POP-2 image from the early 1970s and a
+BESM-6 emulator. We call that system the <I>emulated Russian POP-2</I> here.
+
+<P>
+
+The emulated Russian POP-2 was quite difficult to work with &mdash; it is
+undocumented, fragile, and has extremely limited memory resources (the BESM-6
+had even less memory than the ICL 4130 on which PLTP ran). Certain legal
+POP-2 programs cannot be compiled or are compiled or emulated
+incorrectly. The compiler silently truncates identifiers to 6 characters
+(whereas the 1973 Edinburgh compiler truncated to 8), thus causing some
+invisible name collisions.  The compiler also got stack overflows trying to
+process even modestly nested POP-2 expressions and we had to refactor the
+code with many jumps and assignments to get it to compile.  We use the
+name <I>PLTP(R)</I> for the PLTP code refactored to compile under the
+emulated Russian POP-2.  But even after apparently successful compilation,
+PLTP(R) produced runtime errors or unexplained failures on some proof
+attempts of theorems in the regression.
+
+<P>
+
+We ultimately gave up on this attempt since it was clear that, even if we
+could get the emulated Russian POP-2 to run the regression successfully on
+some modified version of the code it would not demonstrate how the original
+source code ran.  The ACL2 and OCaml implementations, PLTP(A) and PLTP(O),
+are better illustrations of the capabilities of PLTP than PLTP(R).
+
+<H2>Annotated Bibliography</H2>
+<A NAME="AnnotatedBibliography">
+
+<UL>
+<LI>Moore's dissertation, Part I of which describes our work on structure sharing in resolution theorem proving,
+including our Prolog-like language Baroque and its Lisp-like counterpart, and Part II of which fully describes
+PLTP: <A HREF="http://www.cs.utexas.edu/users/moore/publications/Moore-Thesis-1973-OCR.pdf">Computational
+Logic: Structure Sharing and Proof of Program Properties</A>.  PhD Thesis,
+Department of Computational Logic, University of Edinburgh, 1973.
+<P>
+
+<LI>The IJCAI-73 paper on
+PLTP: <A HREF="http://www.cs.utexas.edu/users/moore/publications/bm-ijcai-73.pdf">Proving
+Theorems about LISP Functions</A>, R.S. Boyer and J S. Moore, Third
+International Joint Conference on Artificial Intelligence (IJCAI-73),
+Stanford University, 1973, pp. 486-493.
+<P>
+
+<LI>The longer, archival publication of PLTP in
+JACM: <A HREF="http://www.cs.utexas.edu/users/moore/publications/bm75.pdf">Proving
+Theorems about LISP Functions</A>, R.S. Boyer and J S. Moore. <I>Journal of
+the Association for Computing Machinery</I>,
+<B>22</B>(1), 1975, pp.129-144.  (Note:  The last page of the pdf file lists the submission date
+as `September, 1993.'  This is an obvious OCR error; the paper was submitted in September, 1973 and appeared in 1975!)
+<P>
+
+<LI><A HREF="POP-2-Reference-Manual.pdf">POP-2 Reference Manual</A> by R.M. Burstall and R.J. Popplestone,
+Department of Machine Intelligence and Perception, University of Edinburgh, 1972.
+<P>
+
+<LI><A HREF="POP-2-4100-Users-Manual-OCR.pdf">POP-2/4100 User's Manual</A> by
+R. D. Dunn, School of Artificial Intelligence, University of Edinburgh, 1972.
+<P>
+
+<LI><A HREF="scanned-images/index.html">Scanned OCR Images of our 1973
+lineprinter listings</A>.  These images are faded and sometimes hard to read
+but are the definitive historical record.  Among the listings are all the files
+in the implementation of PLTP described in Moore's dissertation and the output
+of a proveall regression run from several months earlier.  If you want to see
+what PLTP did in July, 1973, look at that!  <B>Warning:</B> The OCR data in these scans is
+often incorrect, e.g., 8's coded as B's, 3's etc.  <I>Do not trust negative
+search results over these scans!</I>
+<P>
+
+<LI><A HREF="listings-f-and-h/index.html">A text file containing the POP-2
+source code from 14 September, 1973</A>.  Listings F and H of the scans
+contain everything needed to reconstruct the September core of the prover
+described in Moore's dissertation.  Because of the OCR errors in the scans we
+undertook the manual transcription of these two listings into simple text
+form.  Barring transcription errors (which we have worked hard to eliminate)
+this is a convenient, machine-readable, listing of the original POP-2 code
+for PLTP as described in Moore's dissertation.
+<P>
+
+<LI><A HREF="bugs/index.html">Bugs and oddities</A> in the 14 September,
+1973, code for PLTP.  These bugs were noticed in our recent (2017) inspection
+of the code after 45 years of experience writing theorem provers.  These
+problems do not manifest themselves in any of the published examples of PLTP
+proofs.  Furthermore, inspection of the few source listings with creation
+dates after 14 September, 1973, reveals that several of these bugs were
+subsequently noticed and fixed by Boyer and Moore.
+<P>
+
+<LI>Our 2017 re-implementations of PLTP:
+
+<UL>
+<LI><A HREF="pltpa/index.html">PLTP(A)</A>: a recoding of the PLTP sources into the applicative Common Lisp of ACL2</A>.
+
+<LI><A HREF="pltpo/index.html">PLTP(O)</A>: an implementation of PLTP in OCaml based on Moore's dissertation and the 1975 JACM paper</A>.
+
+<LI><A HREF="pltpr/index.html">PLTP(R)</A>: ultimately unsuccessful attempt to get modified PLTP source code to compile and run in the emulated Russian POP-2.
+
+</UL>
+<P>
+
+<LI><A HREF="pretty-print.pdf">PRETTY-PRINT</A> by R. S. Boyer, Department of
+Computational Logic, Memo 64, University of Edinburgh, 1972(?) &mdash;
+Boyer's linear-time prettyprint algorithm that produces beautiful and
+``exact'' output (in the sense of reliably using the full line width when
+necessary).  Most prettyprinters use heuristics to guess when it is time to
+print on a new line.  PLTP(R) is running Boyer's algorithm.  PLTP(A) and
+PLTP(O) use the standard prettyprinting of their host systems, ACL2 and OCaml.
+It should be noted that ACL2's prettyprinter is a direct descendant of
+Boyer's algorithm modified to handle the more complex s-expressions of Common
+Lisp.
+
+</UL>
+
+<P>
+
+
+
+

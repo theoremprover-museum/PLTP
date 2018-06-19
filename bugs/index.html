@@ -1,0 +1,279 @@
+<HTML>
+<HEAD>
+<TITLE>Bugs and Oddities</TITLE>
+</HEAD>
+<BODY TEXT="#000000" 
+      BGCOLOR="FFFFFF"
+      LINK ="#FF0000"
+      VLINK="#A020F0" 
+      ALINK="#FFD700"
+      "fixed">
+
+<CENTER>
+<H1>Bugs and Oddities in the 14 September, 1973, PLTP Source Code </H1>
+<BR>
+Robert S. Boyer
+<BR>
+J Strother Moore
+<BR>
+August, 2017
+</CENTER>
+
+<H2>Acknowledgement</H2> We deeply appreciate the help we received from Grant Olney Passmore
+in assembling this website.  He should by rights be a co-author of this ``bug report.''
+But because the source being critiqued is entirely that of Boyer and Moore, the document
+is easier to write in the first person!
+
+<H2>Background</H2>
+
+Re-reading our source code with the benefit of 45 years of experience in
+coding theorem provers there are many things we'd do differently if we were
+doing it again!  The PLTP code of 14 September, 1973, has a few bugs that
+could have caused it to ``prove'' non-theorems even when used in ways we
+imagined it should be used.  In addition, it failed to check or enforce some
+implicit preconditions that, if violated, could cause other problems.  And we
+find some of the design decisions and stylistic conventions perplexing and
+needlessly messy by our coding standards today.
+<P>
+These criticisms are somewhat mitigated by three observations.
+<UL>
+<P>
+<LI>PLTP was always just a
+research tool for us and never really intended to be used by others.  We were
+exploring the automation of induction and the almost-exclusive use of
+rewriting as a theorem proving paradigm.
+<P>
+<LI>The 14 September, 1973, version of the code was just a snapshot of an
+ever-changing system.  Some of the problems discussed here were subsequently fixed by
+us, as can be seen by looking at, say, the source files from November, 1973
+<A HREF="../scanned-images/Listing-B-OCR.pdf">Listing-B</A>,
+<A HREF="../scanned-images/Listing-C-OCR.pdf">Listing-C</A>,
+<A HREF="../scanned-images/Listing-D-OCR.pdf">Listing-D</A>, and
+<A HREF="../scanned-images/Listing-E-OCR.pdf">Listing-E</A>.
+<P>
+<LI>The POP-2/ICL 4130 system we were using was extraordinarily
+cramped and slow by today's standards and so it was necessary to take some
+short-cuts just to get PLTP to run.
+</UL>
+<P>
+Having said all that, we now critique the 14 September, 1973, version of
+PLTP.  The definitive sources for that version of the code is provided
+in <A HREF="../scanned-images/Listing-F-OCR.pdf">Listing-F</A> and
+<A HREF="../scanned-images/Listing-H-OCR.pdf">Listing-H</A>.  However,
+because those are hard-to-search OCR pdf files, we have transcribed the
+contents of those listings into a simple text file henceforth referred to as
+<A HREF="../listings-f-and-h/listings-f-and-h.txt">listings-f-and-h</A>.
+We assume you can use your favorite text editor to search the listings and/or
+find the lines mentioned by number.
+
+<P>
+
+<H2>A Perplexing Design Choice that Permeates the Code</H2>
+<P>
+In PLTP's logical theory there were five primitives functions symbols,
+<CODE>CAR</CODE>, <CODE>CDR</CODE>, <CODE>CONS</CODE>, <CODE>EQUAL</CODE>,
+and <CODE>COND</CODE>, and there was one
+constant, <CODE>NIL</CODE>.
+<P>
+<CODE>T</CODE> abbreviated <CODE>(CONS NIL
+NIL)</CODE>.
+<CODE>0</CODE> abbreviated <CODE>NIL</CODE>, <CODE>1</CODE> abbreviated <CODE>(CONS NIL 0)</CODE>,
+<CODE>2</CODE> abbreviated <CODE>(CONS NIL 1)</CODE>, etc.
+<P>
+PLTP did not check the well-formedness of input terms and did not expand abbreviations away
+before beginning the theorem proving process.  Thus, for example, the code might encounter
+<CODE>T</CODE>, <CODE>1</CODE>, <CODE>(CONS NIL NIL)</CODE>, <CODE>(CONS 0 NIL)</CODE>, etc., all of which
+are different concrete representations of the same logical term.
+<P>
+This convention of allowing multiple concrete representations of the same
+abstract term invites coding mistakes and several of the bugs below are due
+to this.
+
+<H2><CODE>FUNCTION EVAL</CODE> (line 128)</H2> 
+
+In the code for handling <CODE>X = "CDR"</CODE>, where we say <CODE>THEN Y - 1;</CODE> (line 170) we are
+trying to implement such transformations as the evaluation of <CODE>(CDR 3)</CODE> to <CODE>2</CODE>,
+by replacing <CODE>(CDR <I>y</I>)</CODE> by <I>y-1</I> when <I>y</I> is a number.  But we don't know
+that <I>y</I> is non-0.  Thus, the definition of <CODE>EVAL</CODE> will evaluate <CODE>(CDR 0)</CODE> to <CODE>-1</CODE>,
+which is not actually a term.  We should have considered the possibility that <I>y</I> is <CODE>0</CODE> here and returned
+<CODE>NIL</CODE> since <CODE>0</CODE> and <CODE>NIL</CODE> represent the same term and we see, from the <CODE>Y=NIL</CODE> case,
+that <CODE>(CDR NIL)</CODE> is <CODE>NIL</CODE>.
+<P>
+An oddity (but not bug) in <CODE>EVAL</CODE> is the code:
+<PRE><CODE>
+  RETURN;
+  STEPCNT + 1 -> STEPCNT;
+  GOTO CONDRULES;
+</CODE></PRE>
+Since the <CODE>RETURN</CODE> exits the function, the two lines after it are dead code.
+
+<H2><CODE>FUNCTION ISREALLINK</CODE> (line 424)</H2>
+
+This is not so much a bug as an oddity.  In <CODE>ISREALLINK</CODE> we
+use <CODE>ISINTEGER</CODE> to recognize numbers representing lists of <CODE>NIL</CODE>s.
+But everywhere else (nine times) we use the more
+general <CODE>ISNUMBER</CODE> to recognize such terms.  Note: There are ten
+occurrences of <CODE>ISNUMBER</CODE> in the code, but the occurrence
+in <CODE>GENSYM</CODE> is not concerned with a term.
+<P>
+It would have been nice to see the same idiom used throughout the code.
+<P>
+By the way, the name ``<CODE>ISREALLINK</CODE>'' stems from the POP-2
+convention of calling a cons-pair a <I>link</I>.  In the parlance of ACL2,
+this function is meant to recognize <I>explicit values</I>, variable-free
+terms using only constructors (i.e., <CODE>CONS</CODE> here) and constants
+(<CODE>NIL</CODE> here).
+
+<H2><CODE>FUNCTION ISNUMSKO</CODE> (line 438) and All Its Callers</H2>
+
+All uses of <CODE>ISNUMSKO</CODE> are suspect because they implement the
+assumption that ``numeric variables'' may only be instantiated with
+numerically valued terms, but the logical language is untyped.
+<P>
+<CODE>ISNUMSKO</CODE> recognizes POP-2 words beginning which a letter between <CODE>I</CODE>
+and <CODE>N</CODE>.  These are considered ``numeric'' variables.  For example,
+if the system is trying to prove <CODE>(<I>p</I> N)</CODE> then it might do an induction
+suitable for natural numbers:
+<CODE>(AND (<I>p</I> 0) (IMPLIES (<I>p</I> N) (<I>p</I> (ADD1 N))))</CODE>.
+This would be ok if one thought of oneself as proving <CODE>(IMPLIES (NUMBERP
+N) (<I>p</I> N))</CODE> which, indeed, we imagined.
+<P>
+However, because the language is untyped one can still imagine problems.
+Suppose one defined the successor function, <CODE>(DEFINE (SUCC (N) (CONS NIL
+N)))</CODE> with the numeric formal parameter <CODE>N</CODE>.
+Then <CODE>SUCC</CODE> would be considered always numerically valued and that
+fact would be stored on the property list of <CODE>SUCC</CODE>.  It would
+have been possible to then prove <CODE>(NUMBERP (SUCC (CONS T T)))</CODE>
+which is unfortunate since it evaluates to <CODE>NIL</CODE>!
+<P>
+This contradiction would not be possible if one prohibited function
+definitions from having numeric formal parameters like <CODE>N</CODE>.
+Indeed, no definition in the standard proveall or the JACM paper used numeric
+formal parameters.  Furthermore, PLTP never instantiated previously proved
+theorems.  So we believe that from a practical perspective, this bug never
+manifested itself.
+<P>
+But we consider the whole idea of numeric variables suspect without a proper
+type system!
+
+<H2><CODE>FUNCTION ISCONS</CODE> (line 446)</H2>
+
+This function is supposed to return <CODE>1</CODE> (POP-2's true truthvalue)
+if the term is a <CODE>CONS</CODE>, i.e., has <CODE>CONS</CODE> as its
+top-level function symbol, and <CODE>0</CODE> (false) otherwise.  But this
+code treats all numbers as representing <CODE>CONS</CODE>es.
+But <CODE>0</CODE> does not represent a <CODE>CONS</CODE>.
+
+<H2><CODE>FUNCTION APPSUB1</CODE> (line 480)</H2>
+
+<CODE>APPSUB</CODE> is the function that that applies a substitution to a term and
+<CODE>APPSUB1</CODE> does all the work.  But this function does not just
+visit the subterms, it visits and possibly replaces the function symbols too.
+<P>
+This is not necessarily a problem and, indeed, problems can be avoided if (a)
+the set of symbols allowed as function symbols in the theory were disjoint
+from the set of symbols used as variables and (b) well-formedness were
+checked when new definitions and theorems are submitted.  But PLTP does
+not make such checks.
+<P>
+Suppose the user defined a predicate named <CODE>X</CODE>, and imagine that
+some conjecture to be proved by induction involved both the
+function <CODE>X</CODE> and the variable <CODE>X</CODE>.  The base case is
+formed by using <CODE>APPSUB</CODE> to replace <CODE>X</CODE>
+by <CODE>NIL</CODE> in the conjecture to be proved, and the induction
+conclusion is formed by replacing <CODE>X</CODE> by <CODE>(CONS X1 X)</CODE>.
+But if the conjecture were <CODE>(X X)</CODE> this would create the
+nonsensical non-formula:
+<PRE><CODE>
+(AND (NIL NIL)
+     (IMPLIES (X X) ((CONS X1 X) (CONS X1 X)))).
+</CODE></PRE>
+<P>
+Fortunately, PLTP's provealls never introduced a function symbol whose name was
+ever used as a variable symbol.  So this bug never manifested itself.
+<P>
+Furthermore, the induction mechanism
+actually <I>exploits</I> <CODE>APPSUB</CODE>'s ability to replace function
+symbols.  The <CODE>FUNCTION PICKINDVARS</CODE> uses <CODE>APPSUB</CODE> to
+rename all occurrences of <CODE>CAR</CODE> and <CODE>CDR</CODE> to new
+symbols to avoid confusing <CODE>CAR</CODE>- and <CODE>CDR</CODE>-terms in the
+input formula with <CODE>CAR</CODE>- and <CODE>CDR</CODE>-terms introduced by
+evaluation.
+
+
+<H2><CODE>FUNCTION TYPEEXP1</CODE> (line 652)</H2>
+
+This function takes a term, <CODE>TERM</CODE>, and returns an expression in
+the variable <CODE>X</CODE> that recognizes the output of the term.  For
+example, if <CODE>TERM</CODE> is <CODE>(CONS 1 V)</CODE> the returned
+expression is a term equivalent to <CODE>(AND X (EQUAL (CAR X) 1))</CODE>.
+When <CODE>TERM</CODE> is the call of some function, <I>fn</I>, for which
+no <I>type function</I> has been stored, <CODE>TYPEEXP1</CODE> recursively
+computes the type expression for the body of <I>fn</I>,
+stores an appropriate type function with name <I>fn</I><CODE>TYPE</CODE>,
+and returns <CODE>(<I>fn</I>TYPE X)</CODE>.
+<P>
+There are two problems.
+<P>
+The case <CODE>ELSEIF FUNSYM = "CONS"</CODE> dealing with <CODE>TERM</CODE> being
+a <CODE>CONS</CODE>-expression is incorrect when it checks <CODE>NUMERIC(TERM)</CODE> (line 665).
+It should also check that <CODE>TERM</CODE> is an explicit value, i.e.,
+<CODE>(ISREALLINK TERM)</CODE>.  Otherwise, <CODE>TERM</CODE> might be a term like
+<CODE>(CONS NIL (TIMES A B))</CODE> which is a numerically valued term
+beginning with <CODE>CONS</CODE>.  Since <CODE>TYPEEXP1</CODE> generates the
+definition of a type function whose formal parameter is <CODE>X</CODE>, this
+bug could result in a type function whose definition contains free variables,
+e.g., <CODE>A</CODE> and <CODE>B</CODE> in the example just given.
+
+<P>
+The second problem is that <CODE>TYPEEXP1</CODE> does not check that the newly introduced
+<I>fn</I><CODE>TYPE</CODE> is a new function symbol.  It will inadvertently
+redefine that function  (line 696) if the user has previously defined a function of that
+name.  An obvious correction is to enforce a pre-condition that no user
+function name ends with <CODE>TYPE</CODE>.  None of the definitions in the
+provealls violate this pre-condition.
+
+<H2><CODE>FUNCTION GENSYM</CODE> (line 779)</H2>
+
+<CODE>GENSYM</CODE> is used to generate ``new'' variable symbols.  It does so by
+taking an existing symbol (<CODE>TOPWORD</CODE>) and tacking on an integer ``suffix,'' as when it transforms the root (<CODE>TOPWORD</CODE>) symbol
+<CODE>X</CODE> to <CODE>X1</CODE>.  For any given root symbol, the first suffix it uses in a given proof is <CODE>1</CODE>,
+the next time in that proof it uses <CODE>2</CODE>, etc.
+<P>
+The problem with this is that it assumes that the user did not included any
+suffixed variables in the original conjecture.  That is, the code is written
+as though the only suffixed variables are those introduced
+by <CODE>GENSYM</CODE>.  If the user submitted a conjecture containing the
+variable symbol <CODE>X1</CODE> and <CODE>GENSYM</CODE> is called with root
+symbol <CODE>X</CODE>, it will generate <CODE>X1</CODE> but that would not be
+a new variable.
+<P>
+No variable used in our provealls is suffixed.  So this potential problem
+never manifested itself.  The problem could be fixed by simply enforcing a
+pre-condition that no user-submitted term contained suffixed variables.
+
+
+<H2>The Value of <CODE>RIDCARCDR</CODE> (line 1864)</H2>
+
+The replacement of <CODE>CAR</CODE> and <CODE>CDR</CODE> mentioned in the
+above discussion of <CODE>APPSUB1</CODE> is done by applying the
+substitution <CODE>RIDCARCDR</CODE> whose value is set by this assignment:
+<PRE><CODE>
+CONSPAIR("CAR","CARARG")::(CONSPAIR("CDR","CDRARG")::NIL)
+ -> RIDCARCDR;
+</CODE></PRE> So <CODE>CARARG</CODE> and <CODE>CDRARG</CODE> are assumed to
+be function symbols of arity 1 that do not occur in any user formula.  This
+is another implicit pre-condition that ought to be enforced: <CODE>CARARG</CODE>
+and <CODE>CDRARG</CODE> are never defined or used by user.
+
+</HTML>
+
+
+While no change was caused by this, the following is worth noting: in the
+EQUAL case of FUNCTION EVAL there is an odd sequence:
+
+
+
+because the RETURN rips control out.  Thus, the last two statements above are
+dead code.
+
